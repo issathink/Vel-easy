@@ -99,9 +99,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             user_PosMarker.setPosition( pos);
             user_PosMarker.setTitle("toz");
         }
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
         mMap.animateCamera(CameraUpdateFactory.zoomIn());
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(18), 2000, null);
 
     }
     @Override
