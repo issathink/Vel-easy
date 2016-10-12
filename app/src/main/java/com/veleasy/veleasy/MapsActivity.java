@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -22,15 +21,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final int MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION=123;
 
+    private boolean hashLocationPermission = false;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation;
+    private Marker user_PosMarker = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,33 +44,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
-            mGoogleApiClient.connect();
-            Log.e("Yo","Init");
-        }else{
-            Log.e("Yo","Init2");
-            mGoogleApiClient.connect();
         }
+            mGoogleApiClient.connect();
+
+        // Check if user gave the permission for Location
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION);
         }else {
+            hashLocationPermission = true;
            initMapAsync();
         }
-
-        new CountDownTimer(6000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-                Log.e("Toz","AZEA");
-            }
-
-            public void onFinish() {
-                mLastLocation.setLatitude(mLastLocation.getLatitude()+0.001d);
-                mLastLocation.setLongitude(mLastLocation.getLongitude()+0.001d);
-                updatePos(new Location(mLastLocation));
-            }
-
-        }.start();
 
 
     }
@@ -93,13 +80,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void updatePos(Location l){
-        LatLng sydney;
+        LatLng pos;
+        // Get last position or ridiculous position
         if(mLastLocation!=null)
-            sydney = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        else
-            sydney = new LatLng(2,2);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("5"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            pos = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        else {
+            pos = new LatLng(2, 2);
+            Log.e("Erreur","No lastLocation");
+        }
+
+        //Change the marker for position
+        if(user_PosMarker == null) {
+            user_PosMarker = mMap.addMarker(new MarkerOptions()
+                    .position(pos)
+                    .title("Tu es la :)"));
+        }
+        else{
+            user_PosMarker.setPosition( pos);
+            user_PosMarker.setTitle("toz");
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
         mMap.animateCamera(CameraUpdateFactory.zoomIn());
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
 
@@ -112,8 +112,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d("PERMIISSION","Jai la permission");
+                    hashLocationPermission = true;
                     initMapAsync();
+
                 } else {
+                    hashLocationPermission = false;
                     Log.d("PERMIISSION","Jai pas la permission");
                 }
                 return;
@@ -122,10 +125,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @SuppressWarnings("MissingPermission")
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
+        // onConnect gets user last Location and update the GoogleMap
         Log.e("Lol","Je passe connecte");
         updatePos(mLastLocation);
     }
