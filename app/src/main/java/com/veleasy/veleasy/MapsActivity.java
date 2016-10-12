@@ -3,6 +3,7 @@ package com.veleasy.veleasy;
 import android.*;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -25,6 +26,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -109,6 +112,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.addMarker(new MarkerOptions().position(new LatLng(l1,l2)));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.847786,2.3545948)));
 
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(new LatLng(48.847786,2.3545948  ))
+                    .strokeColor(0xff4285F4)
+                    .fillColor(0x80C8D6EC)
+                    .radius(750); // In meters
+            Circle circle = mMap.addCircle(circleOptions);
+
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e("Log", "Ouah ca marche aps");
@@ -131,29 +141,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void updatePos(Location l){
-        LatLng pos;
-        // Get last position or ridiculous position
-        if(mLastLocation!=null)
-            pos = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        else {
-            pos = new LatLng(2, 2);
-            Log.e("Erreur","No lastLocation");
-        }
 
-        //Change the marker for position
-        if(user_PosMarker == null) {
-            user_PosMarker = mMap.addMarker(new MarkerOptions()
-                    .position(pos)
-                    .title("Tu es la :)"));
-        }
-        else{
-            user_PosMarker.setPosition( pos);
-            user_PosMarker.setTitle("toz");
-        }
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
-        mMap.animateCamera(CameraUpdateFactory.zoomIn());
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(18), 2000, null);
 
     }
 
