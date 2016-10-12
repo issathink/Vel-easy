@@ -8,14 +8,14 @@
         <option name="gradleHome" value="$APPLICATION_HOME_DIR$/gradle/gradle-2.14.1" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/../../../../../nfs/Etu2/3201142/M2/ANDROID/Veleasy" />
-            <option value="$PROJECT_DIR$/../../../../../nfs/Etu2/3201142/M2/ANDROID/Veleasy/app" />
+            <option value="$PROJECT_DIR$/../../../../../nfs/Etu5/3362755/M2/Android/Veleasy" />
+            <option value="$PROJECT_DIR$/../../../../../nfs/Etu5/3362755/M2/Android/Veleasy/app" />
           </set>
         </option>
         <option name="myModules">
           <set>
-            <option value="$PROJECT_DIR$/../../../../../nfs/Etu2/3201142/M2/ANDROID/Veleasy" />
-            <option value="$PROJECT_DIR$/../../../../../nfs/Etu2/3201142/M2/ANDROID/Veleasy/app" />
+            <option value="$PROJECT_DIR$/../../../../../nfs/Etu5/3362755/M2/Android/Veleasy" />
+            <option value="$PROJECT_DIR$/../../../../../nfs/Etu5/3362755/M2/Android/Veleasy/app" />
           </set>
         </option>
       </GradleProjectSettings>
