@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,30 +26,21 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     public static final int MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION=123;
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation;
+    private LocationRequest mLocationRequest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-            mGoogleApiClient.connect();
-            Log.e("Yo","Init");
-        }else{
-            Log.e("Yo","Init2");
-            mGoogleApiClient.connect();
-        }
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -55,20 +48,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }else {
            initMapAsync();
         }
-
-        new CountDownTimer(6000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-                Log.e("Toz","AZEA");
-            }
-
-            public void onFinish() {
-                mLastLocation.setLatitude(mLastLocation.getLatitude()+0.001d);
-                mLastLocation.setLongitude(mLastLocation.getLongitude()+0.001d);
-                updatePos(new Location(mLastLocation));
-            }
-
-        }.start();
 
 
     }
@@ -90,18 +69,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-    }
+        mMap.setMyLocationEnabled(true);
+        buildAndConnectGoogleApiClient();
 
+    }
+    public synchronized  void buildAndConnectGoogleApiClient(){
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        mGoogleApiClient.connect();
+    }
     public void updatePos(Location l){
-        LatLng sydney;
-        if(mLastLocation!=null)
-            sydney = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        else
-            sydney = new LatLng(2,2);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("5"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        mMap.animateCamera(CameraUpdateFactory.zoomIn());
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+        LatLng pos;
+        if(l!=null) {
+            Log.e("Erreur","Loc -> lat "+l.getLatitude()+" et "+l.getLongitude());
+            Toast.makeText(MapsActivity.this, "Loc -> lat "+l.getLatitude()+" et "+l.getLongitude(), Toast.LENGTH_LONG).show();
+            pos = new LatLng(l.getLatitude(), l.getLongitude());
+        } else {
+            Log.e("Erreur","Localisation par defaut");
+            pos = new LatLng(2, 2);
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(16), 2000, null);
 
     }
     @Override
@@ -115,6 +106,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     initMapAsync();
                 } else {
                     Log.d("PERMIISSION","Jai pas la permission");
+                    //TODO Definir quoi faire
                 }
                 return;
 
@@ -124,10 +116,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        Log.e("Lol","Je passe connecte");
-        updatePos(mLastLocation);
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000); //5 seconds
+        mLocationRequest.setFastestInterval(3000); //3 seconds
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
     }
 
     @Override
@@ -141,4 +135,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.e("Lol","Je passe failed");
 
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        LatLng pos;
+        pos = new LatLng(location.getLatitude(), location.getLongitude());
+        mLastLocation = location;
+        Log.d("Log","Si tu marche cest cool");
+        updatePos(mLastLocation);
+
+    }
+
 }
