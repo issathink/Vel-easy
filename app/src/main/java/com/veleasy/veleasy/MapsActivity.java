@@ -2,8 +2,15 @@ package com.veleasy.veleasy;
 
 import android.*;
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -28,6 +35,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -101,7 +109,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .center(circle_Center)
                     .strokeColor(0xff4285F4)
                    // .fillColor(0x60C8D6EC)
-                    .radius(500); // In meters
+                    .radius(400); // In meters
             Circle circle = mMap.addCircle(circleOptions);
 
         } catch (JSONException e) {
@@ -117,11 +125,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             JSONArray position = (JSONArray) fields.get("position");
             Double l1 = (Double) position.get(0);
             Double l2 = (Double) position.get(1);
-            mMap.addMarker(new MarkerOptions().position(new LatLng(l1,l2)));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(l1,l2))
+                    .icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow, "3"))));
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d("MarkerOnMap","Error JSON");
         }
+    }
+    private Bitmap writeTextOnDrawable(int drawableId, String text) {
+
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId)
+                .copy(Bitmap.Config.ARGB_8888, true);
+
+        Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
+
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
+        paint.setTypeface(tf);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(convertToPixels(getBaseContext(), 11));
+
+        Rect textRect = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textRect);
+
+        Canvas canvas = new Canvas(bm);
+
+        //If the text is bigger than the canvas , reduce the font size
+        if(textRect.width() >= (canvas.getWidth() - 4))     //the padding on either sides is considered as 4, so as to appropriately fit in the text
+            paint.setTextSize(convertToPixels(getBaseContext(), 7));        //Scaling needs to be used for different dpi's
+
+        //Calculate the positions
+        int xPos = (canvas.getWidth() / 2) - 2;     //-2 is for regulating the x position offset
+
+        //"- ((paint.descent() + paint.ascent()) / 2)" is the distance from the baseline to the center.
+        int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2)) ;
+
+        canvas.drawText(text, xPos, yPos, paint);
+
+        return  bm;
+    }
+
+
+
+    public static int convertToPixels(Context context, int nDP){
+        final float conversionScale = context.getResources().getDisplayMetrics().density;
+        return (int) ((nDP * conversionScale) + 0.5f) ;
     }
     /**
      * Manipulates the map once available.
@@ -146,7 +195,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     return;
                 float[] results = new float[10];
                 Location.distanceBetween(circle_Center.latitude,circle_Center.longitude,new_CameraPos.latitude,new_CameraPos.longitude,results);
-                if(results[0] >= 400){
+                if(results[0] >= 350){
                     circle_Center = new_CameraPos;
                     mMap.clear();
                     changeVolleyRequest();
@@ -167,7 +216,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mGoogleApiClient.connect();
     }
     private void changeVolleyRequest() {
-        URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance="+circle_Center.latitude+"%2C"+circle_Center.longitude+"%2C500";
+        URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance="+circle_Center.latitude+"%2C"+circle_Center.longitude+"%2C400";
         jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
                     @Override
