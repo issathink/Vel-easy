@@ -125,8 +125,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             JSONArray position = (JSONArray) fields.get("position");
             Double l1 = (Double) position.get(0);
             Double l2 = (Double) position.get(1);
-            mMap.addMarker(new MarkerOptions().position(new LatLng(l1,l2))
-                    .icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow, "3"))));
+            Integer nbVelibDispo = (Integer) fields.get("available_bikes");
+            Log.e("lol",nbVelibDispo.toString());
+             mMap.addMarker(new MarkerOptions().position(new LatLng(l1,l2))
+                    .icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow, nbVelibDispo.toString()))));
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d("MarkerOnMap","Error JSON");
@@ -156,10 +158,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             paint.setTextSize(convertToPixels(getBaseContext(), 7));        //Scaling needs to be used for different dpi's
 
         //Calculate the positions
-        int xPos = (canvas.getWidth() / 2) - 2;     //-2 is for regulating the x position offset
+        int xPos = (canvas.getWidth() / 2) - 0;     //-2 is for regulating the x position offset
 
         //"- ((paint.descent() + paint.ascent()) / 2)" is the distance from the baseline to the center.
-        int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2)) ;
+        int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2)) - 4 ;
 
         canvas.drawText(text, xPos, yPos, paint);
 
@@ -235,16 +237,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void updatePos(Location l){
-/*        LatLng pos;
-        if(l!=null) {
-            Log.e("Erreur","Loc -> lat "+l.getLatitude()+" et "+l.getLongitude());
-            Toast.makeText(MapsActivity.this, "Loc -> lat "+l.getLatitude()+" et "+l.getLongitude(), Toast.LENGTH_LONG).show();
-            pos = new LatLng(l.getLatitude(), l.getLongitude());
-        } else {
-            Log.e("Erreur","Localisation par defaut");
-            pos = new LatLng(2, 2);
-        }
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));*/
     }
 
     @Override
@@ -278,7 +270,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(circle_Center == null){
             circle_Center = pos;
             mMap.moveCamera(CameraUpdateFactory.newLatLng(circle_Center));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(16),2000,null);
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(14),2000,null);
         }
         updatePos(mLastLocation);
 
