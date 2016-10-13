@@ -43,7 +43,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public static final int MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION=123;
-    private static final String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel";
+    private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel";
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
@@ -61,7 +61,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.e("mba","TozWin");
+                        Log.e("mba",response.toString());
                         addMarkersToMap(response);
                     }
                 }, new Response.ErrorListener() {
@@ -79,7 +79,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION);
         }else {
-            VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
             initMapAsync();
         }
 
@@ -94,12 +93,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     public void addMarkersToMap(JSONObject jsonObject) {
         try {
-            JSONObject lol = (JSONObject) jsonObject.getJSONArray("records").get(0);
-            JSONObject lol2 = (JSONObject) lol.get("fields");
-            JSONArray lol3 = (JSONArray) lol2.get("position");
-            Double l1 = (Double) lol3.get(0);
-            Double l2 = (Double) lol3.get(1);
-            mMap.addMarker(new MarkerOptions().position(new LatLng(l1,l2)));
+            JSONArray jsonArray = (JSONArray) jsonObject.getJSONArray("records");
+            int n = jsonArray.length();
+            for(int i = 0 ; i < n ; i++)
+                addMarkerToMap((JSONObject) jsonArray.get(i));
             CircleOptions circleOptions = new CircleOptions()
                     .center(circle_Center)
                     .strokeColor(0xff4285F4)
@@ -113,7 +110,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
-
+    public void addMarkerToMap(JSONObject jsonObject){
+        JSONObject fields = null;
+        try {
+            fields = (JSONObject) jsonObject.get("fields");
+            JSONArray position = (JSONArray) fields.get("position");
+            Double l1 = (Double) position.get(0);
+            Double l2 = (Double) position.get(1);
+            mMap.addMarker(new MarkerOptions().position(new LatLng(l1,l2)));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d("MarkerOnMap","Error JSON");
+        }
+    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -129,19 +138,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         buildAndConnectGoogleApiClient();
-        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
-            public void onCameraMove() {
+            public void onCameraIdle() {
                 LatLng new_CameraPos = mMap.getCameraPosition().target;
+                if(new_CameraPos == null || circle_Center == null)
+                    return;
                 float[] results = new float[10];
                 Location.distanceBetween(circle_Center.latitude,circle_Center.longitude,new_CameraPos.latitude,new_CameraPos.longitude,results);
                 if(results[0] >= 400){
                     circle_Center = new_CameraPos;
                     mMap.clear();
+                    changeVolleyRequest();
                     VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
 
                 }
             }
+
+            
         });
     }
     public synchronized  void buildAndConnectGoogleApiClient(){
@@ -151,6 +165,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .addApi(LocationServices.API)
                 .build();
         mGoogleApiClient.connect();
+    }
+    private void changeVolleyRequest() {
+        URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance="+circle_Center.latitude+"%2C"+circle_Center.longitude+"%2C500";
+        jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e("mba",response.toString());
+                        addMarkersToMap(response);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("mba","TozLose");
+
+                    }
+                });
     }
 
     public void updatePos(Location l){
@@ -196,6 +228,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLastLocation = location;
         if(circle_Center == null){
             circle_Center = pos;
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(circle_Center));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(16),2000,null);
         }
         updatePos(mLastLocation);
 
