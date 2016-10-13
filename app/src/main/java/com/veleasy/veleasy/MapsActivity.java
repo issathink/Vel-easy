@@ -21,15 +21,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-<<<<<<< HEAD
 import com.google.android.gms.maps.model.CameraPosition;
-=======
->>>>>>> 472ba0e2e54116e57d774c53d426d94fa43736fa
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -40,22 +39,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener,GoogleMap.OnCameraMoveListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
     public static final int MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION=123;
     private static final String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel";
 
-    private boolean hashLocationPermission = false;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation;
-    private Marker user_PosMarker = null;
     private JsonObjectRequest jsonObjectRequest;
-
-
-    private JsonObjectRequest jsonObjectRequest;
-
+    private LocationRequest mLocationRequest;
+    private LatLng circle_Center = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +61,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.e("mba","Toz");
+                        Log.e("mba","TozWin");
                         addMarkersToMap(response);
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("mba","Tozzzz");
+                        Log.e("mba","TozLose");
 
                     }
                 });
@@ -84,11 +79,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION);
         }else {
-            hashLocationPermission = true;
             VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
             initMapAsync();
         }
-
 
 
 
@@ -99,7 +92,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
     public void addMarkersToMap(JSONObject jsonObject) {
         try {
             JSONObject lol = (JSONObject) jsonObject.getJSONArray("records").get(0);
@@ -107,15 +99,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             JSONArray lol3 = (JSONArray) lol2.get("position");
             Double l1 = (Double) lol3.get(0);
             Double l2 = (Double) lol3.get(1);
-            Log.d("YOO",l1.toString());
             mMap.addMarker(new MarkerOptions().position(new LatLng(l1,l2)));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.847786,2.3545948)));
-
             CircleOptions circleOptions = new CircleOptions()
-                    .center(new LatLng(48.847786,2.3545948  ))
+                    .center(circle_Center)
                     .strokeColor(0xff4285F4)
-                    .fillColor(0x80C8D6EC)
-                    .radius(500); // In meters
+                   // .fillColor(0x60C8D6EC)
+                    .radius(400); // In meters
             Circle circle = mMap.addCircle(circleOptions);
 
         } catch (JSONException e) {
@@ -134,12 +123,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @SuppressWarnings("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         buildAndConnectGoogleApiClient();
-        Log.e("toz","yo");
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                LatLng new_CameraPos = mMap.getCameraPosition().target;
+                float[] results = new float[10];
+                Location.distanceBetween(circle_Center.latitude,circle_Center.longitude,new_CameraPos.latitude,new_CameraPos.longitude,results);
+                if(results[0] >= 400){
+                    circle_Center = new_CameraPos;
+                    mMap.clear();
+                    VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
+
+                }
+            }
+        });
     }
     public synchronized  void buildAndConnectGoogleApiClient(){
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -171,14 +174,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d("PERMIISSION","Jai la permission");
-                    hashLocationPermission = true;
                     initMapAsync();
 
                     // Access the RequestQueue through your singleton class.
                     VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
 
                 } else {
-                    hashLocationPermission = false;
                     Log.d("PERMIISSION","Jai pas la permission");
                 }
                 return;
@@ -193,10 +194,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng pos;
         pos = new LatLng(location.getLatitude(), location.getLongitude());
         mLastLocation = location;
-        Log.d("Log","Si tu marche cest cool");
+        if(circle_Center == null){
+            circle_Center = pos;
+        }
         updatePos(mLastLocation);
 
     }
+    @SuppressWarnings("MissingPermission")
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         mLocationRequest = new LocationRequest();
@@ -217,11 +221,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e("Lol","Je passe failed");
 
-    }
-    @Override
-    public void onCameraMove() {
-        CameraPosition ss = mMap.getCameraPosition();
-        Log.d("TOOZZ",ss.target.toString());
     }
 
 }
