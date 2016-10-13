@@ -101,7 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .center(circle_Center)
                     .strokeColor(0xff4285F4)
                    // .fillColor(0x60C8D6EC)
-                    .radius(400); // In meters
+                    .radius(500); // In meters
             Circle circle = mMap.addCircle(circleOptions);
 
         } catch (JSONException e) {
