@@ -21,14 +21,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+<<<<<<< HEAD
 import com.google.android.gms.maps.model.CameraPosition;
+=======
+>>>>>>> 472ba0e2e54116e57d774c53d426d94fa43736fa
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -41,6 +42,7 @@ import org.json.JSONObject;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener,GoogleMap.OnCameraMoveListener {
 
+
     public static final int MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION=123;
     private static final String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel";
 
@@ -48,7 +50,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation;
-    private LocationRequest mLocationRequest;
+    private Marker user_PosMarker = null;
+    private JsonObjectRequest jsonObjectRequest;
+
 
     private JsonObjectRequest jsonObjectRequest;
 
@@ -157,7 +161,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             pos = new LatLng(2, 2);
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));*/
-
     }
 
     @Override
@@ -184,6 +187,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @SuppressWarnings("MissingPermission")
     @Override
     public void onLocationChanged(Location location) {
         LatLng pos;
@@ -214,7 +218,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.e("Lol","Je passe failed");
 
     }
-
     @Override
     public void onCameraMove() {
         CameraPosition ss = mMap.getCameraPosition();
