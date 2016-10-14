@@ -5,4 +5,15 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.veleasy.veleasy.MapsActivity" />
+    tools:context="com.veleasy.veleasy.MapsActivity">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Demo Button"
+        android:padding="10dp"
+        android:onClick="changeValue"
+        android:layout_marginTop="20dp"
+        android:paddingRight="10dp"/>
+
+    </fragment>

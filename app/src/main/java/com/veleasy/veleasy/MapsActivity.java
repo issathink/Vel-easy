@@ -20,6 +20,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -28,6 +29,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -47,6 +49,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
@@ -59,7 +65,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private JsonObjectRequest jsonObjectRequest;
     private LocationRequest mLocationRequest;
     private LatLng circle_Center = null;
+    private HashMap<Station,Marker> cachedStation;
+    private Circle circle;
 
+    private boolean isShowingVelib = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,11 +98,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }else {
             initMapAsync();
         }
-
-
+        cachedStation = new HashMap<>();
 
     }
-
     public void initMapAsync(){
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -101,16 +108,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     public void addMarkersToMap(JSONObject jsonObject) {
         try {
-            JSONArray jsonArray = (JSONArray) jsonObject.getJSONArray("records");
+            cachedStation.clear();
+            JSONArray jsonArray = jsonObject.getJSONArray("records");
             int n = jsonArray.length();
             for(int i = 0 ; i < n ; i++)
                 addMarkerToMap((JSONObject) jsonArray.get(i));
+
             CircleOptions circleOptions = new CircleOptions()
                     .center(circle_Center)
                     .strokeColor(0xff4285F4)
-                   // .fillColor(0x60C8D6EC)
                     .radius(400); // In meters
-            Circle circle = mMap.addCircle(circleOptions);
+            if(mMap == null)
+                Log.e("toztoztz","tztoztozt");
+            circle = mMap.addCircle(circleOptions);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -118,17 +128,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
+    public  void changeValue(View v){
+        isShowingVelib = !isShowingVelib;
+        if(isShowingVelib){
+            circle.setStrokeColor(0xff4285F4);
+            for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
+                Integer numberToShow = entry.getKey().getAvailable_bike();
+                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow,numberToShow.toString())));
+            }
+        }else{
+            circle.setStrokeColor(0xffFFA500);
+            for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
+                Integer numberToShow = entry.getKey().getAvailable_bike_Stand();
+                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow,numberToShow.toString())));
+            }
+        }
+    }
+    /**
+     * Allows to add a Marker on the googleMap from the data contained in the JsonObject
+     * @param jsonObject
+     *
+     */
     public void addMarkerToMap(JSONObject jsonObject){
         JSONObject fields = null;
         try {
             fields = (JSONObject) jsonObject.get("fields");
             JSONArray position = (JSONArray) fields.get("position");
-            Double l1 = (Double) position.get(0);
-            Double l2 = (Double) position.get(1);
+            LatLng pos =new LatLng((Double)position.get(0),(Double)position.get(1));
             Integer nbVelibDispo = (Integer) fields.get("available_bikes");
-            Log.e("lol",nbVelibDispo.toString());
-             mMap.addMarker(new MarkerOptions().position(new LatLng(l1,l2))
-                    .icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow, nbVelibDispo.toString()))));
+            String adressName = (String) fields.get("address");
+            String tmpBanking = (String) fields.get("banking");
+            boolean banking = tmpBanking.contains("True");
+            Integer nbStandDispo = (Integer) fields.get("available_bike_stands");
+            Integer nbStands = (Integer) fields.get("bike_stands");
+            String status = (String) fields.get("status");
+            Station st = new Station(status,nbStands,nbStandDispo,banking,nbVelibDispo,adressName,pos);
+
+            Integer numberToShow;
+            if(isShowingVelib)
+                numberToShow = st.getAvailable_bike();
+            else
+                numberToShow = st.getAvailable_bike_Stand();
+
+             Marker m =mMap.addMarker(new MarkerOptions().position(pos)
+                    .icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow,numberToShow.toString()))));
+            cachedStation.put(st,m);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d("MarkerOnMap","Error JSON");
