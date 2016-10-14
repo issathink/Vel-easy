@@ -1,22 +1,13 @@
 package com.veleasy.veleasy;
 
 import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -52,7 +43,7 @@ import java.util.Map;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
-    public static final int MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION = 123;
+    public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 123;
     private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel";
 
     private GoogleMap mMap;
@@ -90,7 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         if(permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION);
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }else {
             initMapAsync();
         }
@@ -112,12 +103,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for(int i = 0 ; i < n ; i++)
                 addMarkerToMap((JSONObject) jsonArray.get(i));
 
-            CircleOptions circleOptions = new CircleOptions()
-                    .center(circle_Center)
-                    .strokeColor(0xff4285F4)
-                    .radius(400); // In meters
+            CircleOptions circleOptions = new CircleOptions().center(circle_Center).strokeColor(0xff4285F4).radius(400); // In meters
             if(mMap == null)
-                Log.e("toztoztz","tztoztozt");
+                Log.e("ERROR","Why map is null ?");
             circle = mMap.addCircle(circleOptions);
 
         } catch (JSONException e) {
@@ -135,13 +123,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             circle.setStrokeColor(0xff4285F4);
             for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
                 Integer numberToShow = entry.getKey().getAvailableBike();
-                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow,numberToShow.toString())));
+                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, R.mipmap.arrow,numberToShow.toString())));
             }
         }else{
             circle.setStrokeColor(0xffFFA500);
             for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
                 Integer numberToShow = entry.getKey().getAvailableBikeStand();
-                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow,numberToShow.toString())));
+                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, R.mipmap.arrow,numberToShow.toString())));
             }
         }
         // startActivity(new Intent());
@@ -163,13 +151,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             JSONArray position = (JSONArray) fields.get("position");
             LatLng pos =new LatLng((Double)position.get(0),(Double)position.get(1));
             Integer nbVelibDispo = (Integer) fields.get("available_bikes");
-            String adressName = (String) fields.get("address");
+            String addressName = (String) fields.get("address");
             String tmpBanking = (String) fields.get("banking");
             boolean banking = tmpBanking.contains("True");
             Integer nbStandDispo = (Integer) fields.get("available_bike_stands");
             Integer nbStands = (Integer) fields.get("bike_stands");
             String status = (String) fields.get("status");
-            Station st = new Station(status,nbStands,nbStandDispo,banking,nbVelibDispo,adressName,pos);
+            Station st = new Station(status,nbStands,nbStandDispo,banking,nbVelibDispo,addressName,pos);
 
             Integer numberToShow;
             if(isShowingVelib)
@@ -178,51 +166,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 numberToShow = st.getAvailableBikeStand();
 
              Marker m =mMap.addMarker(new MarkerOptions().position(pos)
-                    .icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow,numberToShow.toString()))));
+                    .icon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, R.mipmap.arrow,numberToShow.toString()))));
             cachedStation.put(st,m);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d("MarkerOnMap","Error JSON");
         }
-    }
-
-    private Bitmap writeTextOnDrawable(int drawableId, String text) {
-
-        Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId)
-                .copy(Bitmap.Config.ARGB_8888, true);
-
-        Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
-
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.WHITE);
-        paint.setTypeface(tf);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(convertToPixels(getBaseContext(), 11));
-
-        Rect textRect = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textRect);
-
-        Canvas canvas = new Canvas(bm);
-
-        //If the text is bigger than the canvas , reduce the font size
-        if(textRect.width() >= (canvas.getWidth() - 4))     //the padding on either sides is considered as 4, so as to appropriately fit in the text
-            paint.setTextSize(convertToPixels(getBaseContext(), 7));        //Scaling needs to be used for different dpi's
-
-        //Calculate the positions
-        int xPos = (canvas.getWidth() / 2) - 0;     //-2 is for regulating the x position offset
-
-        //"- ((paint.descent() + paint.ascent()) / 2)" is the distance from the baseline to the center.
-        int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2)) - 4 ;
-
-        canvas.drawText(text, xPos, yPos, paint);
-
-        return  bm;
-    }
-
-    public static int convertToPixels(Context context, int nDP){
-        final float conversionScale = context.getResources().getDisplayMetrics().density;
-        return (int) ((nDP * conversionScale) + 0.5f) ;
     }
 
     /**
@@ -243,25 +192,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
-                LatLng new_CameraPos = mMap.getCameraPosition().target;
-                if(new_CameraPos == null || circle_Center == null)
+                LatLng newCameraPos = mMap.getCameraPosition().target;
+                if(newCameraPos == null || circle_Center == null)
                     return;
                 float[] results = new float[10];
-                Location.distanceBetween(circle_Center.latitude,circle_Center.longitude,new_CameraPos.latitude,new_CameraPos.longitude,results);
+                Location.distanceBetween(circle_Center.latitude,circle_Center.longitude,newCameraPos.latitude,newCameraPos.longitude,results);
                 if(results[0] >= 350){
-                    circle_Center = new_CameraPos;
+                    circle_Center = newCameraPos;
                     mMap.clear();
                     changeVolleyRequest();
                     VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
-
                 }
             }
-
-            
         });
     }
 
-    public synchronized  void buildAndConnectGoogleApiClient(){
+    public synchronized void buildAndConnectGoogleApiClient(){
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -296,20 +242,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("PERMIISSION","Jai la permission");
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("PERMISSION","Jai la permission");
                     initMapAsync();
 
-                    // Access the RequestQueue through your singleton class.
+                    // Access the RequestQueue through singleton class.
                     VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
 
                 } else {
-                    Log.d("PERMIISSION","Jai pas la permission");
+                    Log.d("PERMISSION","Jai pas la permission");
                 }
-                return;
-
+                break;
             }
         }
     }
@@ -323,32 +267,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(circle_Center == null){
             circle_Center = pos;
             mMap.moveCamera(CameraUpdateFactory.newLatLng(circle_Center));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(14),2000,null);
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
         }
         updatePos(mLastLocation);
-
     }
+
     @SuppressWarnings("MissingPermission")
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(30000); //3 seconds
-        mLocationRequest.setFastestInterval(30000); //3 seconds
+        mLocationRequest.setInterval(30000); // 3 seconds
+        mLocationRequest.setFastestInterval(30000); // 3 seconds
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         Log.e("Lol","Je passe suspend");
-
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e("Lol","Je passe failed");
-
     }
 
 }
