@@ -1,8 +1,8 @@
 package com.veleasy.veleasy;
 
-import android.*;
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,7 +12,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.location.Location;
-import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -29,7 +28,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -38,7 +36,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -49,14 +46,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
-    public static final int MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION=123;
+    public static final int MY_PERMISSIONS_REQUEST_ACCES_FINE_LOCATION = 123;
     private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel";
 
     private GoogleMap mMap;
@@ -67,8 +63,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng circle_Center = null;
     private HashMap<Station,Marker> cachedStation;
     private Circle circle;
-
     private boolean isShowingVelib = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,11 +97,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         cachedStation = new HashMap<>();
 
     }
+
     public void initMapAsync(){
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+
     public void addMarkersToMap(JSONObject jsonObject) {
         try {
             cachedStation.clear();
@@ -128,22 +126,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
+
     public  void changeValue(View v){
+        Log.e("LOGS", (mMap == null) + " ");
+
         isShowingVelib = !isShowingVelib;
         if(isShowingVelib){
             circle.setStrokeColor(0xff4285F4);
             for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
-                Integer numberToShow = entry.getKey().getAvailable_bike();
+                Integer numberToShow = entry.getKey().getAvailableBike();
                 entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow,numberToShow.toString())));
             }
         }else{
             circle.setStrokeColor(0xffFFA500);
             for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
-                Integer numberToShow = entry.getKey().getAvailable_bike_Stand();
+                Integer numberToShow = entry.getKey().getAvailableBikeStand();
                 entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow,numberToShow.toString())));
             }
         }
+        // startActivity(new Intent());
     }
+
+    public void preference(View v) {
+        Toast.makeText(this, "Yo!", Toast.LENGTH_SHORT).show();
+    }
+
     /**
      * Allows to add a Marker on the googleMap from the data contained in the JsonObject
      * @param jsonObject
@@ -166,9 +173,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             Integer numberToShow;
             if(isShowingVelib)
-                numberToShow = st.getAvailable_bike();
+                numberToShow = st.getAvailableBike();
             else
-                numberToShow = st.getAvailable_bike_Stand();
+                numberToShow = st.getAvailableBikeStand();
 
              Marker m =mMap.addMarker(new MarkerOptions().position(pos)
                     .icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.mipmap.arrow,numberToShow.toString()))));
@@ -178,6 +185,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("MarkerOnMap","Error JSON");
         }
     }
+
     private Bitmap writeTextOnDrawable(int drawableId, String text) {
 
         Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId)
@@ -212,12 +220,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return  bm;
     }
 
-
-
     public static int convertToPixels(Context context, int nDP){
         final float conversionScale = context.getResources().getDisplayMetrics().density;
         return (int) ((nDP * conversionScale) + 0.5f) ;
     }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -253,6 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             
         });
     }
+
     public synchronized  void buildAndConnectGoogleApiClient(){
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -261,6 +269,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .build();
         mGoogleApiClient.connect();
     }
+
     private void changeVolleyRequest() {
         URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance="+circle_Center.latitude+"%2C"+circle_Center.longitude+"%2C400";
         jsonObjectRequest = new JsonObjectRequest

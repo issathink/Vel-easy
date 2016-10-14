@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Vel\'easy</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
+    <string name="velibs_disponibles">Velibs</string>
+    <string name="places_disponibles">Places</string>
+    <string name="preference">Preferences</string>
 </resources>
