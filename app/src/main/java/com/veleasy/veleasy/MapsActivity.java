@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -44,8 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 123;
-    private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel";
-
+    private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance=48.855221%2C2.347919%2C400";
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation;
@@ -65,7 +65,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.e("mba",response.toString());
                         addMarkersToMap(response);
                     }
                 }, new Response.ErrorListener() {
@@ -98,7 +97,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.e("mba",response.toString());
                         addMarkersToMap(response);
                     }
                 }, new Response.ErrorListener() {
@@ -118,14 +116,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int n = jsonArray.length();
             for(int i = 0 ; i < n ; i++)
                 addMarkerToMap((JSONObject) jsonArray.get(i));
-
-            CircleOptions circleOptions = new CircleOptions().center(circle_Center).strokeColor(0xff4285F4).radius(400); // In meters
+            CircleOptions circleOptions;
+            if(circle_Center!=null)
+                circleOptions = new CircleOptions().center(circle_Center).strokeColor(0xff4285F4).radius(400); // In meters
+            else
+                circleOptions = new CircleOptions().center(new LatLng(48.855221, 2.347919)).strokeColor(0xff4285F4).radius(400); // In meters
             if(mMap == null)
                 Log.e("ERROR","Why map is null ?");
             if(circleOptions == null)
                 Log.e("ERROR","Why zae is null ?");
-            Log.e("toz",mMap.toString());
-            Log.e("toz",circleOptions.toString());
+
 
             circle = mMap.addCircle(circleOptions);
 
@@ -135,30 +135,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
-
-    public  void changeValueToShow(View v){
-        Log.e("LOGS", (mMap == null) + " ");
-        isShowingVelib = !isShowingVelib;
-        if(isShowingVelib){
-            circle.setStrokeColor(0xff4285F4);
-            int bitmap = R.mipmap.arrow_b;
-
-            for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
-                Integer numberToShow = entry.getKey().getAvailableBike();
-                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap ,numberToShow.toString())));
-            }
-        }else{
-            circle.setStrokeColor(0xffFFA500);
-            int bitmap = R.mipmap.arrow_o;
-            for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
-                Integer numberToShow = entry.getKey().getAvailableBikeStand();
-                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString())));
-            }
-        }
-        // startActivity(new Intent());
-    }
-
-
 
     /**
      * Allows to add a Marker on the googleMap from the data contained in the JsonObject
@@ -189,8 +165,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 bitmap = R.mipmap.arrow_o;
             }
 
-             Marker m = mMap.addMarker(new MarkerOptions().position(pos)
-                                .icon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString()))));
+            Marker m = mMap.addMarker(new MarkerOptions().position(pos)
+                    .icon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString()))));
 
             cachedStation.put(st,m);
         } catch (JSONException e) {
@@ -198,6 +174,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("MarkerOnMap","Error JSON");
         }
     }
+
+    public  void changeValueToShow(View v){
+        isShowingVelib = !isShowingVelib;
+        if(isShowingVelib){
+            circle.setStrokeColor(0xff4285F4);
+            int bitmap = R.mipmap.arrow_b;
+
+            for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
+                Integer numberToShow = entry.getKey().getAvailableBike();
+                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap ,numberToShow.toString())));
+            }
+        }else{
+            circle.setStrokeColor(0xffFFA500);
+            int bitmap = R.mipmap.arrow_o;
+            for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
+                Integer numberToShow = entry.getKey().getAvailableBikeStand();
+                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString())));
+            }
+        }
+        // startActivity(new Intent());
+    }
+
+
+
+
 
     public void initMapAsync(){
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -219,10 +220,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         buildAndConnectGoogleApiClient();
+
+        //Paris 1er arrondissement
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.855221, 2.347919)));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+        boolean isLocationEnabled = false;
+        try {
+           isLocationEnabled = Settings.Secure.getInt(getBaseContext().getContentResolver(), Settings.Secure.LOCATION_MODE)  != 0; // Mode_off = 0
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+        if(!isLocationEnabled)
+            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
+
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
-                Log.e("Idle","Yo");
                 LatLng newCameraPos = mMap.getCameraPosition().target;
                 if(newCameraPos == null || circle_Center == null)
                     return;
@@ -266,7 +279,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     initMapAsync();
 
                     // Access the RequestQueue through singleton class.
-                    VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
 
                 } else {
                     Log.d("PERMISSION","Jai pas la permission");
@@ -286,6 +298,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             circle_Center = pos;
             mMap.moveCamera(CameraUpdateFactory.newLatLng(circle_Center));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+            mMap.clear();
+            changeVolleyRequest();
+            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
+
         }
         updatePos(mLastLocation);
     }
