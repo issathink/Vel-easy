@@ -14,14 +14,6 @@
             android:background="#ffffffff"
             android:layout_margin="15dp"
             android:padding="10dp" >
-
-<!--
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/preference"
-                android:padding="10dp"
-                android:onClick="preference" />-->
             <fragment
                 android:id="@+id/autocomplete_fragment"
                 android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
@@ -37,25 +29,33 @@
                     android:onClick="changeValueToShow" />
             </fragment>
         </LinearLayout>
+
      <RelativeLayout
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:padding="10dp" >
-         <RelativeLayout
+         <LinearLayout
              android:layout_width="match_parent"
-             android:background="@color/colorPrimary"
              android:layout_alignParentBottom="true"
+             android:gravity="center"
+
              android:layout_height="wrap_content">
              <Button
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="@string/places_disponibles"
-                 android:layout_centerInParent="true"
+                 android:text="@string/velibs_disponibles"
                  android:padding="10dp"
                  android:id="@+id/velo"
                  android:onClick="changeValueToShow" />
+             <Button
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/places_disponibles"
+                 android:padding="10dp"
+                 android:id="@+id/place"
+                 android:onClick="changeValueToShow" />
 
-         </RelativeLayout>
+         </LinearLayout>
 
          </RelativeLayout>
 
