@@ -1,28 +1,81 @@
-package com.veleasy.veleasy;
-
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Created by issa on 14/10/2016.
+ * Created by dasilva.vic on 14/10/2016.
  */
 
 public class Station {
-    private Integer nbStands, nbStandDispo, nbVelibDispo;
-    private String status, addressName;
+    private String status;
+    private int bikeStands;
+    private int availableBikeStand;
     private boolean banking;
-    LatLng pos;
+    private int availableBike;
+    private String addressName;
+    private LatLng position;
 
-    public Station(String status, Integer nbStands, Integer nbStandDispo, boolean banking, Integer nbVelibDispo, String addressName, LatLng pos) {
-
+    public Station(String status, int bikeStands, int availableBikeStand, boolean banking, int availableBike, String addressName, LatLng position) {
+        this.status = status;
+        this.bikeStands = bikeStands;
+        this.availableBikeStand = availableBikeStand;
+        this.banking = banking;
+        this.availableBike = availableBike;
+        this.addressName = addressName;
+        this.position = position;
     }
 
-    public Integer getAvailableBike() {
-        return nbStandDispo;
+    public String isStatus() {
+        return status;
     }
 
-    public Integer getAvailableBikeStand() {
-        return nbStandDispo;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
+    public int getBikeStands() {
+        return bikeStands;
+    }
 
+    public void setBikeStands(int bikeStands) {
+        this.bikeStands = bikeStands;
+    }
+
+    public int getAvailableBikeStand() {
+        return availableBikeStand;
+    }
+
+    public void setAvailableBikeStand(int availableBikeStand) {
+        this.availableBikeStand = availableBikeStand;
+    }
+
+    public boolean isBanking() {
+        return banking;
+    }
+
+    public void setBanking(boolean banking) {
+        this.banking = banking;
+    }
+
+    public int getAvailableBike() {
+        return availableBike;
+    }
+
+    public void setAvailableBike(int availableBike) {
+        this.availableBike = availableBike;
+    }
+
+    public String getAddressName() {
+        return addressName;
+    }
+
+    public void setAddressName(String addressName) {
+        this.addressName = addressName;
+    }
+
+    public LatLng getPosition() {
+        return position;
+    }
+
+    public void setPosition(LatLng position) {
+        this.position = position;
+    }
 }
