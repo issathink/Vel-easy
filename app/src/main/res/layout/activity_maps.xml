@@ -55,8 +55,18 @@
                  android:id="@+id/place"
                  android:onClick="changeValueToShow" />
 
-         </LinearLayout>
 
+
+         </LinearLayout>
+         <ImageButton
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:src="@mipmap/mylocation"
+             android:backgroundTint="#ffffff"
+             android:layout_alignParentRight="true"
+             android:layout_alignParentBottom="true"
+             android:id="@+id/mylocation"
+             android:onClick="changeValueToShow" />
          </RelativeLayout>
 
  </fragment>

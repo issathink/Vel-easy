@@ -236,19 +236,19 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
-
         buildAndConnectGoogleApiClient();
 
         //Paris 1er arrondissement
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.855221, 2.347919)));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+
+        // Calls the api in Chatelet if  user didnt set location on
         boolean isLocationEnabled = false;
         try {
            isLocationEnabled = Settings.Secure.getInt(getBaseContext().getContentResolver(), Settings.Secure.LOCATION_MODE)  != 0; // Mode_off = 0
         } catch (Settings.SettingNotFoundException e) {
             e.printStackTrace();
         }
-
         if(!isLocationEnabled)
             callToApi(false);
 
@@ -310,7 +310,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     public void onLocationChanged(Location location) {
         LatLng pos;
         pos = new LatLng(location.getLatitude(), location.getLongitude());
-        mLastLocation = location;
+        Location mLastLocation = location;
         if(circle_Center == null){
             circle_Center = pos;
             mMap.moveCamera(CameraUpdateFactory.newLatLng(circle_Center));
@@ -324,7 +324,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     @SuppressWarnings("MissingPermission")
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        mLocationRequest = new LocationRequest();
+        LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(30000); // 3 seconds
         mLocationRequest.setFastestInterval(30000); // 3 seconds
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
