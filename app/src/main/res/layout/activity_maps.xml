@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#ffffffff"
-            android:layout_margin="15dp"
+            android:layout_margin="10dp"
             android:padding="10dp" >
             <fragment
                 android:id="@+id/autocomplete_fragment"
@@ -62,7 +62,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:src="@mipmap/mylocation"
-             android:background="@drawable/roundedbutton"
+             android:backgroundTint="#ffffff"
              android:layout_alignParentRight="true"
              android:layout_alignParentBottom="true"
              android:id="@+id/mylocation"
