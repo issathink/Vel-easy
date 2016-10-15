@@ -17,7 +17,7 @@
                 android:text="@string/places_disponibles"
                 android:padding="10dp"
                 android:id="@+id/preference"
-                android:onClick="changeValue" />
+                android:onClick="changeValueToShow" />
 
             <Button
                 android:layout_width="wrap_content"

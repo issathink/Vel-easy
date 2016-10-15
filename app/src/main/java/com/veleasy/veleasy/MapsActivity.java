@@ -84,15 +84,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }else {
             initMapAsync();
+            VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
         }
         cachedStation = new HashMap<>();
 
     }
+    public void preference(View v) {
+        Toast.makeText(this, "Yo!", Toast.LENGTH_SHORT).show();
+    }
 
-    public void initMapAsync(){
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+    private void changeVolleyRequest() {
+        URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance="+circle_Center.latitude+"%2C"+circle_Center.longitude+"%2C400";
+        jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e("mba",response.toString());
+                        addMarkersToMap(response);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("mba","TozLose");
+
+                    }
+                });
     }
 
     public void addMarkersToMap(JSONObject jsonObject) {
@@ -115,29 +132,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    public  void changeValue(View v){
+    public  void changeValueToShow(View v){
         Log.e("LOGS", (mMap == null) + " ");
-
         isShowingVelib = !isShowingVelib;
         if(isShowingVelib){
             circle.setStrokeColor(0xff4285F4);
+            int bitmap = R.mipmap.arrow_b;
             for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
                 Integer numberToShow = entry.getKey().getAvailableBike();
-                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, R.mipmap.arrow,numberToShow.toString())));
+                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap ,numberToShow.toString())));
             }
         }else{
             circle.setStrokeColor(0xffFFA500);
+            int bitmap = R.mipmap.arrow_o;
             for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
                 Integer numberToShow = entry.getKey().getAvailableBikeStand();
-                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, R.mipmap.arrow,numberToShow.toString())));
+                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString())));
             }
         }
         // startActivity(new Intent());
     }
 
-    public void preference(View v) {
-        Toast.makeText(this, "Yo!", Toast.LENGTH_SHORT).show();
-    }
+
 
     /**
      * Allows to add a Marker on the googleMap from the data contained in the JsonObject
@@ -158,15 +174,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Integer nbStands = (Integer) fields.get("bike_stands");
             String status = (String) fields.get("status");
             Station st = new Station(status,nbStands,nbStandDispo,banking,nbVelibDispo,addressName,pos);
-
             Integer numberToShow;
-            if(isShowingVelib)
+            int bitmap;
+            if(isShowingVelib) {
                 numberToShow = st.getAvailableBike();
-            else
+                bitmap = R.mipmap.arrow_b;
+            }else {
                 numberToShow = st.getAvailableBikeStand();
+                bitmap = R.mipmap.arrow_o;
+            }
 
-             Marker m =mMap.addMarker(new MarkerOptions().position(pos)
-                    .icon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, R.mipmap.arrow,numberToShow.toString()))));
+             Marker m = mMap.addMarker(new MarkerOptions().position(pos)
+                                .icon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString()))));
+
             cachedStation.put(st,m);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -174,6 +194,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public void initMapAsync(){
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -207,6 +232,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+
+
     public synchronized void buildAndConnectGoogleApiClient(){
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -216,26 +243,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mGoogleApiClient.connect();
     }
 
-    private void changeVolleyRequest() {
-        URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance="+circle_Center.latitude+"%2C"+circle_Center.longitude+"%2C400";
-        jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.e("mba",response.toString());
-                        addMarkersToMap(response);
-                    }
-                }, new Response.ErrorListener() {
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("mba","TozLose");
-
-                    }
-                });
-    }
 
     public void updatePos(Location l){
+
     }
 
     @Override

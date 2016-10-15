@@ -1,3 +1,5 @@
+package com.veleasy.veleasy;
+
 import com.google.android.gms.maps.model.LatLng;
 
 /**
