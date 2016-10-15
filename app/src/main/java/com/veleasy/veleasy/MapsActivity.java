@@ -55,9 +55,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     private static final int ARROW_O = R.mipmap.arrow_o;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
-    private Location mLastLocation;
     private JsonObjectRequest jsonObjectRequest;
-    private LocationRequest mLocationRequest;
     private LatLng circle_Center = null;
     private HashMap<Station,Marker> cachedStation;
     private Circle circle;
@@ -145,11 +143,6 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
                 circleOptions = new CircleOptions().center(circle_Center).strokeColor(0xff4285F4).radius(400); // In meters
             else
                 circleOptions = new CircleOptions().center(new LatLng(48.855221, 2.347919)).strokeColor(0xff4285F4).radius(400); // In meters
-            if(mMap == null)
-                Log.e("ERROR","Why map is null ?");
-            if(circleOptions == null)
-                Log.e("ERROR","Why zae is null ?");
-
 
             circle = mMap.addCircle(circleOptions);
 
@@ -162,11 +155,11 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
 
     /**
      * Allows to add a Marker on the googleMap from the data contained in the JsonObject
-     * @param jsonObject
+     * @param jsonObject Contains all the information of one station
      *
      */
     public void addMarkerToMap(JSONObject jsonObject){
-        JSONObject fields = null;
+        JSONObject fields;
         try {
             fields = (JSONObject) jsonObject.get("fields");
             JSONArray position = (JSONArray) fields.get("position");
