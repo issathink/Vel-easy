@@ -24,6 +24,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -50,6 +51,8 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
 
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 123;
     private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance=48.855221%2C2.347919%2C400";
+    private static final int ARROW_B = R.mipmap.arrow_b;
+    private static final int ARROW_O = R.mipmap.arrow_o;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
     private Location mLastLocation;
@@ -68,7 +71,12 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                .build();
+        autocompleteFragment.setFilter(typeFilter);
         autocompleteFragment.setOnPlaceSelectedListener(this);
+
 
         jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
@@ -94,6 +102,13 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             initMapAsync();
         }
         cachedStation = new HashMap<>();
+
+    }
+    public void callToApi(boolean isCenterDefined){
+        mMap.clear();
+        if(isCenterDefined)
+            changeVolleyRequest();
+        VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
 
     }
     public void preference(View v) {
@@ -168,10 +183,10 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             int bitmap;
             if(isShowingVelib) {
                 numberToShow = st.getAvailableBike();
-                bitmap = R.mipmap.arrow_b;
+                bitmap = ARROW_B;
             }else {
                 numberToShow = st.getAvailableBikeStand();
-                bitmap = R.mipmap.arrow_o;
+                bitmap = ARROW_O;
             }
 
             Marker m = mMap.addMarker(new MarkerOptions().position(pos)
@@ -188,7 +203,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         isShowingVelib = !isShowingVelib;
         if(isShowingVelib){
             circle.setStrokeColor(0xff4285F4);
-            int bitmap = R.mipmap.arrow_b;
+            int bitmap = ARROW_B;
 
             for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
                 Integer numberToShow = entry.getKey().getAvailableBike();
@@ -196,7 +211,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             }
         }else{
             circle.setStrokeColor(0xffFFA500);
-            int bitmap = R.mipmap.arrow_o;
+            int bitmap =ARROW_O;
             for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
                 Integer numberToShow = entry.getKey().getAvailableBikeStand();
                 entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString())));
@@ -242,7 +257,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         }
 
         if(!isLocationEnabled)
-            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
+            callToApi(false);
 
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
@@ -254,9 +269,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
                 Location.distanceBetween(circle_Center.latitude,circle_Center.longitude,newCameraPos.latitude,newCameraPos.longitude,results);
                 if(results[0] >= 350){
                     circle_Center = newCameraPos;
-                    mMap.clear();
-                    changeVolleyRequest();
-                    VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
+                    callToApi(true);
                 }
             }
 
@@ -309,9 +322,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             circle_Center = pos;
             mMap.moveCamera(CameraUpdateFactory.newLatLng(circle_Center));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
-            mMap.clear();
-            changeVolleyRequest();
-            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
+            callToApi(true);
 
         }
         updatePos(mLastLocation);
@@ -339,7 +350,10 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
 
     @Override
     public void onPlaceSelected(Place place) {
-        Log.i("toz", "Place Selected: " + place.getName());
+        Log.e("toz", "Place Selected: " + place.getName());
+        circle_Center = place.getLatLng();
+        callToApi(true);
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()),2000,null);
 
     }
 
