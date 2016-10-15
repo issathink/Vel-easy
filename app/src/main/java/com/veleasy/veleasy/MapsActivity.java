@@ -20,9 +20,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -41,7 +45,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MapsActivity extends FragmentActivity implements PlaceSelectionListener,OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 123;
@@ -60,6 +64,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.setOnPlaceSelectedListener(this);
 
         jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
@@ -219,6 +228,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
+
         buildAndConnectGoogleApiClient();
 
         //Paris 1er arrondissement
@@ -230,6 +240,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (Settings.SettingNotFoundException e) {
             e.printStackTrace();
         }
+
         if(!isLocationEnabled)
             VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
 
@@ -326,6 +337,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.e("Lol","Je passe failed");
     }
 
+    @Override
+    public void onPlaceSelected(Place place) {
+        Log.i("toz", "Place Selected: " + place.getName());
+
+    }
+
+    @Override
+    public void onError(Status status) {
+        Log.e("Error", "onError: Status = " + status.toString());
+    }
 }
 
 
