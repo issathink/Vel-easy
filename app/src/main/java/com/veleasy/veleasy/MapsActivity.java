@@ -53,6 +53,9 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance=48.855221%2C2.347919%2C400";
     private static final int ARROW_B = R.mipmap.arrow_b;
     private static final int ARROW_O = R.mipmap.arrow_o;
+    private static final int BLUE_COLOR = 0xff4285F4;
+    private static final int ORANGE_COLOR = 0xffFFA500;
+
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
     private JsonObjectRequest jsonObjectRequest;
@@ -139,11 +142,20 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             for(int i = 0 ; i < n ; i++)
                 addMarkerToMap((JSONObject) jsonArray.get(i));
             CircleOptions circleOptions;
-            if(circle_Center!=null)
-                circleOptions = new CircleOptions().center(circle_Center).strokeColor(0xff4285F4).radius(400); // In meters
-            else
-                circleOptions = new CircleOptions().center(new LatLng(48.855221, 2.347919)).strokeColor(0xff4285F4).radius(400); // In meters
-
+            int strokeColor;
+            if(circle_Center!=null) {
+                if(isShowingVelib)
+                    strokeColor = BLUE_COLOR;
+                else
+                    strokeColor = ORANGE_COLOR;
+                circleOptions = new CircleOptions().center(circle_Center).strokeColor(strokeColor).radius(400); // In meters
+            }else {
+                if(isShowingVelib)
+                    strokeColor = BLUE_COLOR;
+                else
+                    strokeColor = ORANGE_COLOR;
+                circleOptions = new CircleOptions().center(new LatLng(48.855221, 2.347919)).strokeColor(strokeColor).radius(400); // In meters
+            }
             circle = mMap.addCircle(circleOptions);
 
         } catch (JSONException e) {
