@@ -84,7 +84,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }else {
             initMapAsync();
-            VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
         }
         cachedStation = new HashMap<>();
 
@@ -123,6 +122,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             CircleOptions circleOptions = new CircleOptions().center(circle_Center).strokeColor(0xff4285F4).radius(400); // In meters
             if(mMap == null)
                 Log.e("ERROR","Why map is null ?");
+            if(circleOptions == null)
+                Log.e("ERROR","Why zae is null ?");
+            Log.e("toz",mMap.toString());
+            Log.e("toz",circleOptions.toString());
+
             circle = mMap.addCircle(circleOptions);
 
         } catch (JSONException e) {
@@ -138,6 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(isShowingVelib){
             circle.setStrokeColor(0xff4285F4);
             int bitmap = R.mipmap.arrow_b;
+
             for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
                 Integer numberToShow = entry.getKey().getAvailableBike();
                 entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap ,numberToShow.toString())));
@@ -217,6 +222,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
+                Log.e("Idle","Yo");
                 LatLng newCameraPos = mMap.getCameraPosition().target;
                 if(newCameraPos == null || circle_Center == null)
                     return;
@@ -229,6 +235,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
                 }
             }
+
         });
     }
 
@@ -278,7 +285,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(circle_Center == null){
             circle_Center = pos;
             mMap.moveCamera(CameraUpdateFactory.newLatLng(circle_Center));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
         }
         updatePos(mLastLocation);
     }
