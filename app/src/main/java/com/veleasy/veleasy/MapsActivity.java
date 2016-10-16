@@ -59,7 +59,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient = null;
     private JsonObjectRequest jsonObjectRequest;
-    private LatLng circle_Center = null;
+    private LatLng circleCenter = null;
     private HashMap<Station,Marker> cachedStation;
     private Circle circle;
     private boolean isShowingVelib = true;
@@ -99,7 +99,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         if(permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }else {
+        } else {
             initMapAsync();
         }
         cachedStation = new HashMap<>();
@@ -110,14 +110,14 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         if(isCenterDefined)
             changeVolleyRequest();
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
-
     }
+
     public void preference(View v) {
         Toast.makeText(this, "Yo!", Toast.LENGTH_SHORT).show();
     }
 
     private void changeVolleyRequest() {
-        URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance="+circle_Center.latitude+"%2C"+circle_Center.longitude+"%2C400";
+        URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&geofilter.distance="+ circleCenter.latitude+"%2C"+ circleCenter.longitude+"%2C400";
         jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
                     @Override
@@ -143,12 +143,12 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
                 addMarkerToMap((JSONObject) jsonArray.get(i));
             CircleOptions circleOptions;
             int strokeColor;
-            if(circle_Center!=null) {
+            if(circleCenter != null) {
                 if(isShowingVelib)
                     strokeColor = BLUE_COLOR;
                 else
                     strokeColor = ORANGE_COLOR;
-                circleOptions = new CircleOptions().center(circle_Center).strokeColor(strokeColor).radius(400); // In meters
+                circleOptions = new CircleOptions().center(circleCenter).strokeColor(strokeColor).radius(400); // In meters
             }else {
                 if(isShowingVelib)
                     strokeColor = BLUE_COLOR;
@@ -225,15 +225,31 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         // startActivity(new Intent());
     }
 
+    public void showVelib(View v) {
+        circle.setStrokeColor(0xff4285F4);
+        int bitmap = ARROW_B;
 
+        for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
+            Integer numberToShow = entry.getKey().getAvailableBike();
+            entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap ,numberToShow.toString())));
+        }
+    }
 
-
+    public void showPlaces(View v) {
+        circle.setStrokeColor(0xffFFA500);
+        int bitmap =ARROW_O;
+        for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
+            Integer numberToShow = entry.getKey().getAvailableBikeStand();
+            entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString())));
+        }
+    }
 
     public void initMapAsync(){
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -261,27 +277,30 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         } catch (Settings.SettingNotFoundException e) {
             e.printStackTrace();
         }
-        if(!isLocationEnabled)
+
+        if(!isLocationEnabled) {
+            circleCenter = new LatLng(48.855221, 2.347919);
             callToApi(false);
+        }
 
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
                 LatLng newCameraPos = mMap.getCameraPosition().target;
-                if(newCameraPos == null || circle_Center == null)
+                Log.e("START", newCameraPos.toString());
+
+                if(newCameraPos == null || circleCenter == null)
                     return;
                 float[] results = new float[10];
-                Location.distanceBetween(circle_Center.latitude,circle_Center.longitude,newCameraPos.latitude,newCameraPos.longitude,results);
+                Location.distanceBetween(circleCenter.latitude, circleCenter.longitude,newCameraPos.latitude,newCameraPos.longitude,results);
                 if(results[0] >= 350){
-                    circle_Center = newCameraPos;
+                    circleCenter = newCameraPos;
                     callToApi(true);
                 }
+                Log.e("END", circleCenter.toString());
             }
-
         });
     }
-
-
 
     public synchronized void buildAndConnectGoogleApiClient(){
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -292,11 +311,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         mGoogleApiClient.connect();
     }
 
-
-
-    public void updatePos(Location l){
-
-    }
+    public void updatePos(Location l){}
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -323,13 +338,12 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         LatLng pos;
         pos = new LatLng(location.getLatitude(), location.getLongitude());
         Location mLastLocation = location;
-        if(circle_Center == null){
-            circle_Center = pos;
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(circle_Center));
+        // if(circleCenter == null){
+            circleCenter = pos;
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(circleCenter));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
             callToApi(true);
-
-        }
+        // }
         updatePos(mLastLocation);
     }
 
@@ -356,10 +370,9 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     @Override
     public void onPlaceSelected(Place place) {
         Log.e("toz", "Place Selected: " + place.getName());
-        circle_Center = place.getLatLng();
+        circleCenter = place.getLatLng();
         callToApi(true);
         mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()),2000,null);
-
     }
 
     @Override

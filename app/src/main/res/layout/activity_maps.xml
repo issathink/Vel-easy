@@ -46,18 +46,16 @@
                  android:text="@string/velibs_disponibles"
                  android:padding="10dp"
                  android:id="@+id/velo"
-                 android:onClick="changeValueToShow" />
+                 android:onClick="showVelib" />
              <Button
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:text="@string/places_disponibles"
                  android:padding="10dp"
                  android:id="@+id/place"
-                 android:onClick="changeValueToShow" />
-
-
-
+                 android:onClick="showPlaces" />
          </LinearLayout>
+
          <ImageButton
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
