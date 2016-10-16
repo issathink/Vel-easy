@@ -62,7 +62,9 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     private LatLng circleCenter = null;
     private HashMap<Station,Marker> cachedStation;
     private Circle circle;
+    private Location mLastLocation;
     private boolean isShowingVelib = true;
+    private boolean zoomOnPositionOnce = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -244,6 +246,19 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         }
     }
 
+    public void startPreferenceActivity(View v) {
+
+    }
+
+    public void goToMyLocation(View v) {
+        if(mLastLocation != null) {
+            circleCenter = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(circleCenter));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+            callToApi(true);
+        }
+    }
+
     public void initMapAsync(){
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -266,7 +281,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         mMap.setMyLocationEnabled(true);
         buildAndConnectGoogleApiClient();
 
-        //Paris 1er arrondissement
+        // Paris 1er arrondissement
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.855221, 2.347919)));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
 
@@ -287,7 +302,6 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             @Override
             public void onCameraIdle() {
                 LatLng newCameraPos = mMap.getCameraPosition().target;
-                Log.e("START", newCameraPos.toString());
 
                 if(newCameraPos == null || circleCenter == null)
                     return;
@@ -297,7 +311,6 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
                     circleCenter = newCameraPos;
                     callToApi(true);
                 }
-                Log.e("END", circleCenter.toString());
             }
         });
     }
@@ -311,7 +324,9 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         mGoogleApiClient.connect();
     }
 
-    public void updatePos(Location l){}
+    public void updatePos(Location l){
+        mLastLocation = l;
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -338,12 +353,13 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         LatLng pos;
         pos = new LatLng(location.getLatitude(), location.getLongitude());
         Location mLastLocation = location;
-        // if(circleCenter == null){
+        if(zoomOnPositionOnce){
+            zoomOnPositionOnce = false;
             circleCenter = pos;
             mMap.moveCamera(CameraUpdateFactory.newLatLng(circleCenter));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
             callToApi(true);
-        // }
+        }
         updatePos(mLastLocation);
     }
 
@@ -355,6 +371,9 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         mLocationRequest.setFastestInterval(30000); // 3 seconds
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+
     }
 
     @Override
