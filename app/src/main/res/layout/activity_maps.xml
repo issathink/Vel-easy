@@ -60,7 +60,7 @@
              android:layout_width="wrap_content"
              android:layout_height="48dp"
              android:src="@mipmap/mylocation"
-             android:backgroundTint="#ffffff"
+             android:background="@drawable/round_button"
              android:layout_alignParentRight="true"
              android:layout_alignParentBottom="true"
              android:id="@+id/mylocation"
