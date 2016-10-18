@@ -1,6 +1,12 @@
 package com.veleasy.veleasy;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by dasilva.vic on 14/10/2016.
@@ -80,4 +86,26 @@ public class Station {
     public void setPosition(LatLng position) {
         this.position = position;
     }
+
+    public static Station getStation(JSONObject jsonObject) {
+        try {
+            JSONObject fields = (JSONObject) jsonObject.get("fields");
+            JSONArray position = (JSONArray) fields.get("position");
+            LatLng pos =new LatLng((Double)position.get(0),(Double)position.get(1));
+            Integer nbVelibDispo = (Integer) fields.get("available_bikes");
+            String addressName = (String) fields.get("address");
+            String tmpBanking = (String) fields.get("banking");
+            boolean banking = tmpBanking.contains("True");
+            Integer nbStandDispo = (Integer) fields.get("available_bike_stands");
+            Integer nbStands = (Integer) fields.get("bike_stands");
+            String status = (String) fields.get("status");
+
+            return new Station(status,nbStands,nbStandDispo,banking,nbVelibDispo,addressName,pos);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d("MarkerOnMap","Error JSON");
+        }
+        return null;
+    }
+
 }

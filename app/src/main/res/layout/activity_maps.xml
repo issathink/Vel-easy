@@ -1,70 +1,73 @@
- <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map"
+    android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.veleasy.veleasy.MapsActivity"
+    tools:layout="@layout/activity_maps">
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.veleasy.veleasy.MapsActivity"
-     tools:layout="@layout/activity_maps">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="#ffffffff"
+        android:padding="10dp">
+
+        <fragment
+            android:id="@+id/autocomplete_fragment"
+            android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+            android:layout_width="match_parent"
+            android:layout_height="35dp">
+
+            <ImageButton
+                android:id="@+id/likes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#ffffffff"
+                android:onClick="startPreferenceActivity"
+                android:padding="10dp"
+                android:src="@mipmap/iconheart" />
+        </fragment>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#ffffffff"
-            android:layout_margin="10dp"
-            android:padding="10dp" >
-            <fragment
-                android:id="@+id/autocomplete_fragment"
-                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-                android:layout_width="match_parent"
-                android:layout_height="35dp" >
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:background="#ffffffff"
-                    android:src="@mipmap/iconheart"
-                    android:id="@+id/likes"
-                    android:onClick="startPreferenceActivity" />
-            </fragment>
+            android:layout_alignParentBottom="true"
+
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/velo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="showVelib"
+                android:padding="10dp"
+                android:text="@string/velibs_disponibles" />
+
+            <Button
+                android:id="@+id/place"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="showPlaces"
+                android:padding="10dp"
+                android:text="@string/places_disponibles" />
         </LinearLayout>
 
-     <RelativeLayout
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:padding="10dp" >
-         <LinearLayout
-             android:layout_width="match_parent"
-             android:layout_alignParentBottom="true"
-             android:gravity="center"
+        <ImageButton
+            android:id="@+id/mylocation"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:onClick="goToMyLocation"
+            android:src="@mipmap/mylocation" />
+    </RelativeLayout>
 
-             android:layout_height="wrap_content">
-             <Button
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="@string/velibs_disponibles"
-                 android:padding="10dp"
-                 android:id="@+id/velo"
-                 android:onClick="showVelib" />
-             <Button
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="@string/places_disponibles"
-                 android:padding="10dp"
-                 android:id="@+id/place"
-                 android:onClick="showPlaces" />
-         </LinearLayout>
-
-         <ImageButton
-             android:layout_width="wrap_content"
-             android:layout_height="48dp"
-             android:src="@mipmap/mylocation"
-             android:background="@drawable/round_button"
-             android:layout_alignParentRight="true"
-             android:layout_alignParentBottom="true"
-             android:id="@+id/mylocation"
-             android:onClick="goToMyLocation" />
-         </RelativeLayout>
-
- </fragment>
+</fragment>

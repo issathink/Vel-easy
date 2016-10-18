@@ -37,7 +37,6 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -168,42 +167,26 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     }
 
     /**
-     * Allows to add a Marker on the googleMap from the data contained in the JsonObject
+     * Allows to add a MyMarker on the googleMap from the data contained in the JsonObject
      * @param jsonObject Contains all the information of one station
      *
      */
     public void addMarkerToMap(JSONObject jsonObject){
-        JSONObject fields;
-        try {
-            fields = (JSONObject) jsonObject.get("fields");
-            JSONArray position = (JSONArray) fields.get("position");
-            LatLng pos =new LatLng((Double)position.get(0),(Double)position.get(1));
-            Integer nbVelibDispo = (Integer) fields.get("available_bikes");
-            String addressName = (String) fields.get("address");
-            String tmpBanking = (String) fields.get("banking");
-            boolean banking = tmpBanking.contains("True");
-            Integer nbStandDispo = (Integer) fields.get("available_bike_stands");
-            Integer nbStands = (Integer) fields.get("bike_stands");
-            String status = (String) fields.get("status");
-            Station st = new Station(status,nbStands,nbStandDispo,banking,nbVelibDispo,addressName,pos);
-            Integer numberToShow;
-            int bitmap;
-            if(isShowingVelib) {
-                numberToShow = st.getAvailableBike();
-                bitmap = ARROW_B;
-            }else {
-                numberToShow = st.getAvailableBikeStand();
-                bitmap = ARROW_O;
-            }
 
-            Marker m = mMap.addMarker(new MarkerOptions().position(pos)
-                    .icon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString()))));
-
-            cachedStation.put(st,m);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.d("MarkerOnMap","Error JSON");
+        Station st = Station.getStation(jsonObject);
+        Integer numberToShow;
+        int bitmap;
+        if(isShowingVelib) {
+            numberToShow = st.getAvailableBike();
+            bitmap = ARROW_B;
+        } else {
+            numberToShow = st.getAvailableBikeStand();
+            bitmap = ARROW_O;
         }
+
+        Marker m = mMap.addMarker(MarkerManager.getNewMarker(this, st.getPosition(), bitmap, numberToShow));
+        cachedStation.put(st,m);
+
     }
 
     public void showVelib(View v) {
@@ -259,6 +242,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         buildAndConnectGoogleApiClient();
+        mMap.setOnMarkerClickListener(new MarkerManager(this, this));
 
         // Paris 1er arrondissement
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.855221, 2.347919)));
@@ -339,7 +323,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
             callToApi(true);
         }
-       // updatePos(mLastLocation);
+       updatePos(mLastLocation);
     }
 
     @SuppressWarnings("MissingPermission")
@@ -377,6 +361,11 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     public void onError(Status status) {
         Log.e("Error", "onError: Status = " + status.toString());
     }
+
+    public HashMap<Station,Marker> getCachedStation() {
+        return cachedStation;
+    }
+
 }
 
 

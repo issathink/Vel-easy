@@ -15,6 +15,12 @@ import android.graphics.Typeface;
 
 public class Tools {
 
+    private static final String FAV_POS1 = "veleasy.com.FAV_POS1";
+    private static final String FAV_POS2 = "veleasy.com.FAV_POS2";
+    private static final String FAV_POS3 = "veleasy.com.FAV_POS3";
+    private static final String FAV_POS4 = "veleasy.com.FAV_POS4";
+    private static final String FAV_POS5 = "veleasy.com.FAV_POS5";
+
     public static Bitmap writeTextOnDrawable(Context context, int drawableId, String text) {
 
         Bitmap bm = BitmapFactory.decodeResource(context.getResources(), drawableId)
@@ -42,7 +48,7 @@ public class Tools {
         int xPos = (canvas.getWidth() / 2) - 0;     //-2 is for regulating the x position offset
 
         //"- ((paint.descent() + paint.ascent()) / 2)" is the distance from the baseline to the center.
-        int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2)) - 4 ;
+        int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2)) - 25;
 
         canvas.drawText(text, xPos, yPos, paint);
 
