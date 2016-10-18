@@ -58,7 +58,7 @@
 
          <ImageButton
              android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
+             android:layout_height="48dp"
              android:src="@mipmap/mylocation"
              android:backgroundTint="#ffffff"
              android:layout_alignParentRight="true"
