@@ -206,27 +206,6 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         }
     }
 
-    public  void changeValueToShow(View v){
-        isShowingVelib = !isShowingVelib;
-        if(isShowingVelib){
-            circle.setStrokeColor(0xff4285F4);
-            int bitmap = ARROW_B;
-
-            for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
-                Integer numberToShow = entry.getKey().getAvailableBike();
-                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap ,numberToShow.toString())));
-            }
-        }else{
-            circle.setStrokeColor(0xffFFA500);
-            int bitmap =ARROW_O;
-            for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
-                Integer numberToShow = entry.getKey().getAvailableBikeStand();
-                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString())));
-            }
-        }
-        // startActivity(new Intent());
-    }
-
     public void showVelib(View v) {
         circle.setStrokeColor(0xff4285F4);
         int bitmap = ARROW_B;
@@ -360,7 +339,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
             callToApi(true);
         }
-        updatePos(mLastLocation);
+       // updatePos(mLastLocation);
     }
 
     @SuppressWarnings("MissingPermission")
