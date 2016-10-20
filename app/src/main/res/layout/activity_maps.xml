@@ -49,15 +49,18 @@
                 android:layout_height="wrap_content"
                 android:onClick="showVelib"
                 android:padding="10dp"
-                android:text="@string/velibs_disponibles" />
+                android:layout_margin="5dp"
+
+                android:background="@mipmap/velibicon" />
 
             <Button
                 android:id="@+id/place"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="showPlaces"
+                android:layout_margin="5dp"
                 android:padding="10dp"
-                android:text="@string/places_disponibles" />
+                android:background="@mipmap/velibicon" />
         </LinearLayout>
 
         <ImageButton
