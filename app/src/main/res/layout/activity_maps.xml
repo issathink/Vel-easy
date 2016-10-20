@@ -63,8 +63,9 @@
         <ImageButton
             android:id="@+id/mylocation"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:background="@drawable/roundedbutton"
             android:layout_alignParentRight="true"
             android:onClick="goToMyLocation"
             android:src="@mipmap/mylocation" />
