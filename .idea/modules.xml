@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Veleasy.iml" filepath="$PROJECT_DIR$/Veleasy.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../../nfs/Etu2/3201142/M2/ANDROID/Veleasy/Veleasy.iml" filepath="$PROJECT_DIR$/../../../../../nfs/Etu2/3201142/M2/ANDROID/Veleasy/Veleasy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../../nfs/Etu2/3201142/M2/ANDROID/Veleasy/app/app.iml" filepath="$PROJECT_DIR$/../../../../../nfs/Etu2/3201142/M2/ANDROID/Veleasy/app/app.iml" />
     </modules>
   </component>
 </project>
