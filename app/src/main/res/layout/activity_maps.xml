@@ -46,7 +46,7 @@
             <Button
                 android:id="@+id/velo"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:onClick="showVelib"
                 android:padding="10dp"
                 android:layout_margin="5dp"
@@ -56,7 +56,7 @@
             <Button
                 android:id="@+id/place"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:onClick="showPlaces"
                 android:layout_margin="5dp"
                 android:padding="10dp"

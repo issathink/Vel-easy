@@ -2,10 +2,13 @@ package com.veleasy.veleasy;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -16,6 +19,7 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
 
     private Activity c;
     private ImageView fav, unFav;
+    private TextView text;
 
     public CustomDialog(Activity a) {
         super(a);
@@ -31,7 +35,7 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
         wmlp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
         wmlp.height = android.view.WindowManager.LayoutParams.WRAP_CONTENT;
         setCanceledOnTouchOutside(true);
-
+        text = (TextView) findViewById(R.id.textview);
         fav = (ImageView) findViewById(R.id.fav_button);
         unFav = (ImageView) findViewById(R.id.unfav_button);
         findViewById(R.id.relative).setOnClickListener(this);
@@ -47,7 +51,11 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
                 Toast.makeText(getContext(), "Fav", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.unfav_button:
-                Toast.makeText(getContext(), "Unfav", Toast.LENGTH_SHORT).show();
+            //    Uri gmmIntentUri = Uri.parse("geo:0,0?q="+text.getText());
+                Uri gmmIntentUri = Uri.parse("google.navigation:q="+text.getText()+"&mode=w");
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                c.startActivity(mapIntent);
                 break;
             default:
                 cancel();
