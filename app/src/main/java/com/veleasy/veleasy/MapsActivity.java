@@ -2,6 +2,7 @@ package com.veleasy.veleasy;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -12,6 +13,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -64,6 +66,8 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     private Location mLastLocation;
     private boolean isShowingVelib = true;
     private boolean zoomOnPositionOnce = true;
+    private Button buttonVelib;
+    private Button buttonPlace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +108,8 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             initMapAsync();
         }
         cachedStation = new HashMap<>();
-
+        buttonPlace = (Button)findViewById(R.id.place);
+        buttonVelib = (Button)findViewById(R.id.velo);
     }
     public void callToApi(boolean isCenterDefined){
         mMap.clear();
@@ -190,21 +195,31 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     }
 
     public void showVelib(View v) {
-        circle.setStrokeColor(0xff4285F4);
-        int bitmap = ARROW_B;
-
-        for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
+        if (!isShowingVelib) {
+            circle.setStrokeColor(0xff4285F4);
+            int bitmap = ARROW_B;
+            buttonPlace.setBackgroundResource(R.mipmap.parkingicon);
+            buttonVelib.setBackgroundResource(R.mipmap.velibiconactive);
+            isShowingVelib = true;
+        for (Map.Entry<Station, Marker> entry : cachedStation.entrySet()) {
             Integer numberToShow = entry.getKey().getAvailableBike();
-            entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap ,numberToShow.toString())));
+            entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap, numberToShow.toString())));
         }
+      }
     }
 
     public void showPlaces(View v) {
-        circle.setStrokeColor(0xffFFA500);
-        int bitmap =ARROW_O;
-        for(Map.Entry<Station,Marker> entry : cachedStation.entrySet()){
-            Integer numberToShow = entry.getKey().getAvailableBikeStand();
-            entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap,numberToShow.toString())));
+        if(isShowingVelib) {
+            circle.setStrokeColor(0xffFFA500);
+            buttonPlace.setBackgroundResource(R.mipmap.parkingiconactive);
+            buttonVelib.setBackgroundResource(R.mipmap.velibicon);
+            isShowingVelib = false;
+            int bitmap = ARROW_O;
+            for (Map.Entry<Station, Marker> entry : cachedStation.entrySet()) {
+                Integer numberToShow = entry.getKey().getAvailableBikeStand();
+                entry.getValue().setIcon(BitmapDescriptorFactory.fromBitmap(Tools.writeTextOnDrawable(this, bitmap, numberToShow.toString())));
+            }
+
         }
     }
 
