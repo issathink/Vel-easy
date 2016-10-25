@@ -16,6 +16,7 @@ public class FavActivity extends AppCompatActivity {
     SharedPreferences shared;
     ListView listView;
     FavAdapter adapter;
+    private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&q=number:";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,5 +56,11 @@ public class FavActivity extends AppCompatActivity {
 
     public void deleteFav(FavObject item) {
         adapter.remove(item);
+    }
+
+    public void upateFav(FavObject item, Station station) {
+        int position = adapter.getPosition(item);
+        adapter.getItem(position).setNumber(station.getNumber());
+        adapter.notifyDataSetChanged();
     }
 }

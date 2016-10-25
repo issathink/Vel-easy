@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:paddingTop="5dp">
 
     <TextView
         android:id="@+id/favText"
         android:layout_width="0dp"
+        android:padding="5dp"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
 
     <ImageView
-        android:layout_width="15dp"
+        android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_weight="0.5"
-        android:paddingBottom="5dp"
         android:src="@mipmap/bicycle" />
 
     <TextView
         android:id="@+id/nbVelib"
-        android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="15"/>
+        android:text="15"
+        android:padding="5dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <ImageView
-        android:padding="5dp"
-        android:paddingTop="10dp"
-        android:layout_width="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_weight="0.5"
-        android:paddingBottom="5dp"
         android:src="@mipmap/parking" />
 
     <TextView
         android:id="@+id/nbPlaces"
-        android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="10"/>
+        android:text="10"
+        android:paddingTop="5dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <ImageButton
+        android:layout_marginLeft="5dp"
         android:id="@+id/favDel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:src="@android:drawable/ic_menu_delete" />
 
 </LinearLayout>

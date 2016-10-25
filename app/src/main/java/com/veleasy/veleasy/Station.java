@@ -20,6 +20,15 @@ public class Station {
     private int availableBike;
     private String addressName;
     private LatLng position;
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
     private Integer number;
 
     public Station(Integer number, String status, int bikeStands, int availableBikeStand, boolean banking, int availableBike, String addressName, LatLng position) {
