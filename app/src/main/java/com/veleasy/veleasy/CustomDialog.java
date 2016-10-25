@@ -37,7 +37,7 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
         setCanceledOnTouchOutside(true);
         text = (TextView) findViewById(R.id.textview);
         fav = (ImageView) findViewById(R.id.fav_button);
-        unFav = (ImageView) findViewById(R.id.unfav_button);
+        unFav = (ImageView) findViewById(R.id.show_route_button);
         findViewById(R.id.relative).setOnClickListener(this);
 
         fav.setOnClickListener(this);
@@ -64,7 +64,7 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
     }
 
     public void fav() {
-        
+
     }
 
 }

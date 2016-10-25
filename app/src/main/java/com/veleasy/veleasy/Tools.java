@@ -15,17 +15,18 @@ import android.graphics.Typeface;
 
 public class Tools {
 
-    private static final String FAV_COUNT = "veleasy.com.FAV_COUNT";
-    private static final String FAV_POS1 = "veleasy.com.FAV_POS1";
-    private static final String FAV_POS2 = "veleasy.com.FAV_POS2";
-    private static final String FAV_POS3 = "veleasy.com.FAV_POS3";
-    private static final String FAV_POS4 = "veleasy.com.FAV_POS4";
-    private static final String FAV_POS5 = "veleasy.com.FAV_POS5";
-    private static final String FAV_POS1_NUM = "veleasy.com.FAV_POS1_NUM";
-    private static final String FAV_POS2_NUM = "veleasy.com.FAV_POS2_NUM";
-    private static final String FAV_POS3_NUM = "veleasy.com.FAV_POS3_NUM";
-    private static final String FAV_POS4_NUM = "veleasy.com.FAV_POS4_NUM";
-    private static final String FAV_POS5_NUM = "veleasy.com.FAV_POS5_NUM";
+    public static final String FAV = "veleasy.com";
+    public static final String FAV_COUNT = "veleasy.com.FAV_COUNT";
+    public static final String FAV_POS1 = "veleasy.com.FAV_POS1";
+    public static final String FAV_POS2 = "veleasy.com.FAV_POS2";
+    public static final String FAV_POS3 = "veleasy.com.FAV_POS3";
+    public static final String FAV_POS4 = "veleasy.com.FAV_POS4";
+    public static final String FAV_POS5 = "veleasy.com.FAV_POS5";
+    public static final String FAV_POS1_NUM = "veleasy.com.FAV_POS1_NUM";
+    public static final String FAV_POS2_NUM = "veleasy.com.FAV_POS2_NUM";
+    public static final String FAV_POS3_NUM = "veleasy.com.FAV_POS3_NUM";
+    public static final String FAV_POS4_NUM = "veleasy.com.FAV_POS4_NUM";
+    public static final String FAV_POS5_NUM = "veleasy.com.FAV_POS5_NUM";
 
     public static Bitmap writeTextOnDrawable(Context context, int drawableId, String text) {
 
