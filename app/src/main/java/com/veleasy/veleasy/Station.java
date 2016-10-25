@@ -20,8 +20,10 @@ public class Station {
     private int availableBike;
     private String addressName;
     private LatLng position;
+    private Integer number;
 
-    public Station(String status, int bikeStands, int availableBikeStand, boolean banking, int availableBike, String addressName, LatLng position) {
+    public Station(Integer number, String status, int bikeStands, int availableBikeStand, boolean banking, int availableBike, String addressName, LatLng position) {
+        this.number = number;
         this.status = status;
         this.bikeStands = bikeStands;
         this.availableBikeStand = availableBikeStand;
@@ -99,8 +101,9 @@ public class Station {
             Integer nbStandDispo = (Integer) fields.get("available_bike_stands");
             Integer nbStands = (Integer) fields.get("bike_stands");
             String status = (String) fields.get("status");
+            Integer number = (Integer) fields.get("number");
 
-            return new Station(status,nbStands,nbStandDispo,banking,nbVelibDispo,addressName,pos);
+            return new Station(number, status,nbStands,nbStandDispo,banking,nbVelibDispo,addressName,pos);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d("MarkerOnMap","Error JSON");

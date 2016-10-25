@@ -49,10 +49,11 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.fav_button:
                 Toast.makeText(getContext(), "Fav", Toast.LENGTH_SHORT).show();
+                fav();
                 break;
-            case R.id.unfav_button:
-            //    Uri gmmIntentUri = Uri.parse("geo:0,0?q="+text.getText());
-                Uri gmmIntentUri = Uri.parse("google.navigation:q="+text.getText()+"&mode=w");
+            case R.id.show_route_button:
+                // Uri gmmIntentUri = Uri.parse("geo:0,0?q="+text.getText());
+                Uri gmmIntentUri = Uri.parse("google.navigation:q="+text.getText()+"&mode=b");
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 c.startActivity(mapIntent);
@@ -61,4 +62,9 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
                 cancel();
         }
     }
+
+    public void fav() {
+        
+    }
+
 }
