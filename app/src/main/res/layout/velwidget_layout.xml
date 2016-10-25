@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_margin="4dp"
     android:background="@drawable/widget_bg">
 
     <LinearLayout
@@ -15,22 +14,23 @@
 
         <TextView
             android:id="@+id/fav1"
-            android:layout_width="140dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:text="Station favorite"
+            android:layout_weight="1"
             android:textColor="@android:color/white"
-            android:textSize="10dp"
+            android:textSize="8sp"
             android:padding="3dp" />
         <TextView
             android:id="@+id/fav2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:textAlignment="center"
+            android:layout_weight="1"
             android:text="Station favorite"
             android:textColor="@android:color/white"
-            android:textSize="10dp"
+            android:textSize="8sp"
             android:padding="3dp" />
 
     </LinearLayout>
@@ -39,78 +39,86 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal">
+
         <ImageView
         android:id="@+id/logo1"
-        android:layout_width="30dp"
+        android:layout_width="wrap_content"
+        android:layout_weight="0.5"
         android:layout_height="30dp"
-        android:src="@mipmap/velicon"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"/>
+            android:paddingBottom="5dp"
+        android:src="@mipmap/bicycle"
+        android:layout_gravity=""
+       />
+
         <TextView
             android:id="@+id/nbVelib1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="10sp"
+            android:layout_weight="0.5"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:text="10"
-            android:paddingTop="7dp"
-            android:paddingLeft="6dp" />
+            android:layout_gravity="center"
+            />
         <ImageView
             android:id="@+id/parking1"
-            android:layout_marginLeft="15dp"
-            android:layout_width="30dp"
+            android:layout_weight="0.5"
+            android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="5dp"
             android:src="@mipmap/parking"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"/>
+            />
+
         <TextView
             android:id="@+id/nbPlace1"
             android:layout_width="wrap_content"
+            android:layout_weight="0.5"
             android:layout_height="wrap_content"
             android:textSize="10sp"
+            android:layout_gravity="center"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:text="10"
-            android:paddingTop="7dp"
-            android:paddingLeft="6dp" />
+            android:text="10" />
 
         <ImageView
             android:id="@+id/logo2"
-            android:layout_width="30dp"
-            android:layout_marginLeft="30dp"
+            android:layout_weight="0.5"
+            android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:src="@mipmap/velicon"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"/>
+            android:paddingBottom="5dp"
+            android:src="@mipmap/bicycle"
+            />
         <TextView
             android:id="@+id/nbVelib2"
+            android:layout_weight="0.5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="10sp"
+            android:layout_gravity="center"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:text="10"
-            android:paddingTop="7dp"
-            android:paddingLeft="6dp" />
+            android:text="10"/>
         <ImageView
             android:id="@+id/parking2"
-            android:layout_marginLeft="15dp"
-            android:layout_width="30dp"
+            android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="5dp"
+            android:layout_weight="0.5"
             android:src="@mipmap/parking"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"/>
+            />
         <TextView
             android:id="@+id/nbPlace2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:textSize="10sp"
+            android:layout_weight="0.5"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:text="10"
-            android:paddingTop="7dp"
-            android:paddingLeft="6dp" />
+            android:text="10" />
     </LinearLayout>
 
 
