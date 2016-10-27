@@ -7,11 +7,12 @@
     <TextView
         android:id="@+id/favText"
         android:layout_width="0dp"
-        android:padding="5dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:padding="5dp" />
 
     <ImageView
+        android:id="@+id/velib"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:src="@mipmap/bicycle" />
@@ -20,29 +21,30 @@
         android:id="@+id/nbVelib"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="15"
         android:padding="5dp"
+        android:text="15"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <ImageView
-        android:layout_marginTop="5dp"
+        android:id="@+id/parking"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
+        android:layout_marginTop="5dp"
         android:src="@mipmap/parking" />
 
     <TextView
         android:id="@+id/nbPlaces"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="10"
         android:paddingTop="5dp"
+        android:text="10"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <ImageButton
-        android:layout_marginLeft="5dp"
         android:id="@+id/favDel"
         android:layout_width="45dp"
         android:layout_height="45dp"
+        android:layout_marginLeft="5dp"
         android:src="@android:drawable/ic_menu_delete" />
 
 </LinearLayout>

@@ -18,12 +18,25 @@ import android.widget.Toast;
 public class CustomDialog extends Dialog implements View.OnClickListener {
 
     private Activity c;
-    private ImageView fav, unFav;
+    private ImageView fav, showRoute;
     private TextView text;
+    private int number;
+    private boolean favorited;
+    private String name;
+    private FavObject favObject;
 
     public CustomDialog(Activity a) {
         super(a);
         this.c = a;
+        this.number = -1;
+        this.favorited = false;
+        this.favObject = null;
+    }
+
+    public void init(int number, String name) {
+        this.number = number;
+        this.name = name;
+        favObject = new FavObject(name, number);
     }
 
     @Override
@@ -37,19 +50,38 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
         setCanceledOnTouchOutside(true);
         text = (TextView) findViewById(R.id.textview);
         fav = (ImageView) findViewById(R.id.fav_button);
-        unFav = (ImageView) findViewById(R.id.show_route_button);
+        showRoute = (ImageView) findViewById(R.id.show_route_button);
         findViewById(R.id.relative).setOnClickListener(this);
 
+        if(((FavActivity) getContext()).isInFavs(number)) {
+            fav.setImageResource(R.mipmap.favfull);
+            favorited = true;
+        }
+
         fav.setOnClickListener(this);
-        unFav.setOnClickListener(this);
+        showRoute.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fav_button:
-                Toast.makeText(getContext(), "Fav", Toast.LENGTH_SHORT).show();
-                fav();
+                // Toast.makeText(getContext(), "Fav", Toast.LENGTH_SHORT).show();
+                if(favorited) {
+                    if(((FavActivity) getContext()).unFav(favObject)) {
+                        favorited = false;
+                        fav.setImageResource(R.mipmap.fav);
+                    } else {
+                        Toast.makeText(getContext(), "Sorry cannot add cannot unfavorite.", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(((FavActivity) getContext()).fav(favObject)) {
+                        favorited = true;
+                        fav.setImageResource(R.mipmap.favfull);
+                    } else {
+                        Toast.makeText(getContext(), "Sorry cannot add it to favorites.", Toast.LENGTH_LONG).show();
+                    }
+                }
                 break;
             case R.id.show_route_button:
                 // Uri gmmIntentUri = Uri.parse("geo:0,0?q="+text.getText());
@@ -61,10 +93,6 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
             default:
                 cancel();
         }
-    }
-
-    public void fav() {
-
     }
 
 }

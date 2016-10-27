@@ -9,13 +9,17 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class FavActivity extends AppCompatActivity {
 
     SharedPreferences shared;
     ListView listView;
     FavAdapter adapter;
+    ArrayList<FavObject> favs;
+    int favSize;
     private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&q=number:";
 
     @Override
@@ -28,7 +32,14 @@ public class FavActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.favList);
         adapter = new FavAdapter(this, R.layout.fav_item, getFavs());
         listView.setAdapter(adapter);
+
         int val = shared.getInt(Tools.FAV_COUNT, 0);
+        List<String> favNames = new ArrayList<>(shared.getStringSet(Tools.FAV_NAMES, new HashSet<String>()));
+        List<String> favNumbers = new ArrayList<>(shared.getStringSet(Tools.FAV_NUMBERS, new HashSet<String>()));
+        favs = new ArrayList<>();
+        for(int i = 0; i < favNames.size(); i++)
+            favs.add(new FavObject(favNames.get(i), Integer.parseInt(favNumbers.get(i))));
+        favSize = favs.size();
 
     }
 
@@ -46,10 +57,12 @@ public class FavActivity extends AppCompatActivity {
         ArrayList<FavObject> list = new ArrayList<>();
         list.add(new FavObject("Paris 5", 5));
         list.add(new FavObject("Paris 6", 6));
+
         return list;
     }
 
     public void updateFavs(List<FavObject> list) {
+
         for(FavObject obj: list)
             Log.e("UPDATE FAVS", obj.toString());
     }
@@ -63,4 +76,26 @@ public class FavActivity extends AppCompatActivity {
         adapter.getItem(position).setNumber(station.getNumber());
         adapter.notifyDataSetChanged();
     }
+
+    public boolean isInFavs(int number) {
+        if(favSize <= 0)
+            return false;
+        for(FavObject o: favs)
+            if(o.getNumber() == number)
+                return true;
+        return false;
+    }
+
+    public boolean fav(FavObject favObject) {
+        if(favSize >= 0)
+            return false;
+
+        return true;
+    }
+
+    public boolean unFav(FavObject favObject) {
+        return true;
+    }
+
+
 }

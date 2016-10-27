@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,10 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
             ViewHolder holder = new ViewHolder();
             holder.textView = (TextView) convertView.findViewById(R.id.favText);
             holder.imageButton = (ImageButton) convertView.findViewById(R.id.favDel);
+            holder.nbPlaces = (TextView) convertView.findViewById(R.id.nbPlaces);
+            holder.nbVelib = (TextView) convertView.findViewById(R.id.nbVelib);
+            holder.parking = (ImageView) convertView.findViewById(R.id.parking);
+            holder.velib = (ImageView) convertView.findViewById(R.id.velib);
             convertView.setTag(holder);
         }
 
@@ -53,6 +58,8 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
         url += item.getNumber();
 
         holder.textView.setText(item.getName());
+        holder.nbVelib.setText(item.getNbVelib());
+        holder.nbPlaces.setText(item.getNbPlaces());
         holder.imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,8 +88,9 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
     }
 
     private static class ViewHolder {
-        public TextView textView;
-        public ImageButton imageButton;
+        private TextView textView, nbPlaces, nbVelib;
+        private ImageButton imageButton;
+        private ImageView parking, velib;
     }
 
 }
