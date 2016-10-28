@@ -77,25 +77,6 @@ public class FavActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    public boolean isInFavs(int number) {
-        if(favSize <= 0)
-            return false;
-        for(FavObject o: favs)
-            if(o.getNumber() == number)
-                return true;
-        return false;
-    }
-
-    public boolean fav(FavObject favObject) {
-        if(favSize >= 0)
-            return false;
-
-        return true;
-    }
-
-    public boolean unFav(FavObject favObject) {
-        return true;
-    }
 
 
 }

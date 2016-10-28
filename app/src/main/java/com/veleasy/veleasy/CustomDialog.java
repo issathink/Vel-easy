@@ -2,7 +2,9 @@ package com.veleasy.veleasy;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +12,11 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by issa on 18/10/2016.
@@ -24,6 +31,9 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
     private boolean favorited;
     private String name;
     private FavObject favObject;
+    private ArrayList<FavObject> favs;
+    private int favSize;
+    private SharedPreferences shared;
 
     public CustomDialog(Activity a) {
         super(a);
@@ -31,6 +41,13 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
         this.number = -1;
         this.favorited = false;
         this.favObject = null;
+        shared = c.getSharedPreferences(Tools.FAV, Context.MODE_PRIVATE);
+        List<String> favNames = new ArrayList<>(shared.getStringSet(Tools.FAV_NAMES, new HashSet<String>()));
+        List<String> favNumbers = new ArrayList<>(shared.getStringSet(Tools.FAV_NUMBERS, new HashSet<String>()));
+        favs = new ArrayList<>();
+        for(int i = 0; i < favNames.size(); i++)
+            favs.add(new FavObject(favNames.get(i), Integer.parseInt(favNumbers.get(i))));
+        favSize = favs.size();
     }
 
     public void init(int number, String name) {
@@ -53,7 +70,7 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
         showRoute = (ImageView) findViewById(R.id.show_route_button);
         findViewById(R.id.relative).setOnClickListener(this);
 
-        if(((FavActivity) getContext()).isInFavs(number)) {
+        if(isInFavs(number)) {
             fav.setImageResource(R.mipmap.favfull);
             favorited = true;
         }
@@ -68,14 +85,14 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
             case R.id.fav_button:
                 // Toast.makeText(getContext(), "Fav", Toast.LENGTH_SHORT).show();
                 if(favorited) {
-                    if(((FavActivity) getContext()).unFav(favObject)) {
+                    if(unFav(favObject)) {
                         favorited = false;
                         fav.setImageResource(R.mipmap.fav);
                     } else {
                         Toast.makeText(getContext(), "Sorry cannot add cannot unfavorite.", Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    if(((FavActivity) getContext()).fav(favObject)) {
+                    if(fav(favObject)) {
                         favorited = true;
                         fav.setImageResource(R.mipmap.favfull);
                     } else {
@@ -93,6 +110,47 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
             default:
                 cancel();
         }
+    }
+
+
+    public boolean isInFavs(int number) {
+        if(favSize <= 0)
+            return false;
+        for(FavObject o: favs)
+            if(o.getNumber() == number)
+                return true;
+        return false;
+    }
+
+    public boolean fav(FavObject favObject) {
+        if(favSize >= 5)
+            return false;
+        favs.add(favObject);
+
+        Set<String> names = new HashSet<>();
+        Set<String> numbers = new HashSet<>();
+        for(int i=0; i<favs.size(); i++) {
+            names.add(favs.get(i).getName());
+            numbers.add("" + favs.get(i).getNumber());
+        }
+        shared.edit().putStringSet(Tools.FAV_NAMES, names).apply();
+        shared.edit().putStringSet(Tools.FAV_NUMBERS, numbers).apply();
+        favSize = favs.size();
+
+        return true;
+    }
+
+    public boolean unFav(FavObject favObject) {
+        int index = -1;
+        for(int i=0; i<favs.size(); i++)
+            if(favObject.getNumber().intValue() == favs.get(i).getNumber().intValue())
+                index = i;
+        if(index != -1) {
+            favs.remove(index);
+            favSize = favs.size();
+            return true;
+        }
+        return false;
     }
 
 }

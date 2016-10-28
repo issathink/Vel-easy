@@ -45,8 +45,8 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
             ViewHolder holder = new ViewHolder();
             holder.textView = (TextView) convertView.findViewById(R.id.favText);
             holder.imageButton = (ImageButton) convertView.findViewById(R.id.favDel);
-            holder.nbPlaces = (TextView) convertView.findViewById(R.id.nbPlaces);
-            holder.nbVelib = (TextView) convertView.findViewById(R.id.nbVelib);
+            holder.nbPlaces = (TextView) convertView.findViewById(R.id.nbPlacesFavItem);
+            holder.nbVelib = (TextView) convertView.findViewById(R.id.nbVelibFavItem);
             holder.parking = (ImageView) convertView.findViewById(R.id.parking);
             holder.velib = (ImageView) convertView.findViewById(R.id.velib);
             convertView.setTag(holder);
@@ -88,9 +88,12 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
     }
 
     private static class ViewHolder {
-        private TextView textView, nbPlaces, nbVelib;
+        private TextView nbVelib;
+        private TextView textView;
+        private TextView nbPlaces;
         private ImageButton imageButton;
-        private ImageView parking, velib;
+        private ImageView parking;
+        private ImageView velib;
     }
 
 }
