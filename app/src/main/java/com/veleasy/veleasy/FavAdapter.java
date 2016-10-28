@@ -28,6 +28,7 @@ import java.util.List;
 public class FavAdapter extends ArrayAdapter<FavObject> {
 
     private List<FavObject> objects;
+    private JsonObjectRequest jsonObjectRequest;
     private String url = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&q=number:";
 
 
@@ -43,10 +44,10 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.fav_item, null);
             ViewHolder holder = new ViewHolder();
+            holder.nbVelib = (TextView) convertView.findViewById(R.id.nbVelibFavItem);
             holder.textView = (TextView) convertView.findViewById(R.id.favText);
             holder.imageButton = (ImageButton) convertView.findViewById(R.id.favDel);
             holder.nbPlaces = (TextView) convertView.findViewById(R.id.nbPlacesFavItem);
-            holder.nbVelib = (TextView) convertView.findViewById(R.id.nbVelibFavItem);
             holder.parking = (ImageView) convertView.findViewById(R.id.parking);
             holder.velib = (ImageView) convertView.findViewById(R.id.velib);
             convertView.setTag(holder);
@@ -58,8 +59,8 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
         url += item.getNumber();
 
         holder.textView.setText(item.getName());
-        holder.nbVelib.setText(item.getNbVelib());
-        holder.nbPlaces.setText(item.getNbPlaces());
+        holder.nbVelib.setText(item.getNbVelib() + "");
+        holder.nbPlaces.setText(item.getNbPlaces() + "");
         holder.imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,18 +72,22 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
             }
         });
 
-        new JsonObjectRequest
+        jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        ((FavActivity)getContext()).upateFav(item, Station.getStation(response));
+                        Log.e("RESPONSE", "Response: " + response.toString());
+                        // upateFav(item, Station.getStation(response));
+                        Toast.makeText(getContext(), "" + response, Toast.LENGTH_SHORT).show();
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("mba", "TozLose");
+                        Toast.makeText(getContext(), "" + error, Toast.LENGTH_SHORT).show();
                     }
                 });
+        VolleySingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
 
         return convertView;
     }

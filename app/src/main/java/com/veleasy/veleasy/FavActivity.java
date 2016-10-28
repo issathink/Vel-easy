@@ -7,11 +7,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class FavActivity extends AppCompatActivity {
 
@@ -20,7 +27,7 @@ public class FavActivity extends AppCompatActivity {
     FavAdapter adapter;
     ArrayList<FavObject> favs;
     int favSize;
-    private String URL = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&q=number:";
+    private String url = "http://opendata.paris.fr/api/records/1.0/search/?dataset=stations-velib-disponibilites-en-temps-reel&q=number:";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +44,7 @@ public class FavActivity extends AppCompatActivity {
         List<String> favNames = new ArrayList<>(shared.getStringSet(Tools.FAV_NAMES, new HashSet<String>()));
         List<String> favNumbers = new ArrayList<>(shared.getStringSet(Tools.FAV_NUMBERS, new HashSet<String>()));
         favs = new ArrayList<>();
-        for(int i = 0; i < favNames.size(); i++)
+        for (int i = 0; i < favNames.size(); i++)
             favs.add(new FavObject(favNames.get(i), Integer.parseInt(favNumbers.get(i))));
         favSize = favs.size();
 
@@ -62,8 +69,8 @@ public class FavActivity extends AppCompatActivity {
     }
 
     public void updateFavs(List<FavObject> list) {
-
-        for(FavObject obj: list)
+        Toast.makeText(getApplicationContext(), "s Update", Toast.LENGTH_SHORT).show();
+        for (FavObject obj : list)
             Log.e("UPDATE FAVS", obj.toString());
     }
 
@@ -72,11 +79,12 @@ public class FavActivity extends AppCompatActivity {
     }
 
     public void upateFav(FavObject item, Station station) {
+        Toast.makeText(getApplicationContext(), "Update fav", Toast.LENGTH_SHORT).show();
         int position = adapter.getPosition(item);
         adapter.getItem(position).setNumber(station.getNumber());
+        adapter.clear();
+
         adapter.notifyDataSetChanged();
     }
-
-
 
 }
