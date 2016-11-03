@@ -110,16 +110,17 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         cachedStation = new HashMap<>();
         buttonPlace = (Button)findViewById(R.id.place);
         buttonVelib = (Button)findViewById(R.id.velo);
+        buttonPlace.setClickable(false);
+        buttonVelib.setClickable(false);
     }
+
     public void callToApi(boolean isCenterDefined){
+        buttonPlace.setClickable(false);
+        buttonVelib.setClickable(false);
         mMap.clear();
         if(isCenterDefined)
             changeVolleyRequest();
         VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(jsonObjectRequest);
-    }
-
-    public void preference(View v) {
-        Toast.makeText(this, "Yo!", Toast.LENGTH_SHORT).show();
     }
 
     private void changeVolleyRequest() {
@@ -163,6 +164,9 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
                 circleOptions = new CircleOptions().center(new LatLng(48.855221, 2.347919)).strokeColor(strokeColor).radius(400); // In meters
             }
             circle = mMap.addCircle(circleOptions);
+            // Toast.makeText(this, "Activating buttons", Toast.LENGTH_SHORT).show();
+            buttonPlace.setClickable(true);
+            buttonVelib.setClickable(true);
 
         } catch (JSONException e) {
             e.printStackTrace();

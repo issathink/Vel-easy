@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -89,14 +90,14 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
                         favorited = false;
                         fav.setImageResource(R.mipmap.fav);
                     } else {
-                        Toast.makeText(getContext(), "Sorry cannot add cannot unfavorite.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Sorry unexpected error try again later.", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     if(fav(favObject)) {
                         favorited = true;
                         fav.setImageResource(R.mipmap.favfull);
                     } else {
-                        Toast.makeText(getContext(), "Sorry cannot add it to favorites.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Sorry you can't have more than 5 favorite stations.", Toast.LENGTH_LONG).show();
                     }
                 }
                 break;
@@ -145,9 +146,18 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
         for(int i=0; i<favs.size(); i++)
             if(favObject.getNumber().intValue() == favs.get(i).getNumber().intValue())
                 index = i;
+        Log.e("WHAT", "unFav don't find: " + favObject + " i: " + index);
         if(index != -1) {
             favs.remove(index);
             favSize = favs.size();
+            Set<String> names = new HashSet<>();
+            Set<String> numbers = new HashSet<>();
+            for(FavObject f: favs) {
+                names.add(f.getName());
+                numbers.add(f.getNumber()+ "");
+            }
+            shared.edit().putStringSet(Tools.FAV_NAMES, names).apply();
+            shared.edit().putStringSet(Tools.FAV_NUMBERS, numbers).apply();
             return true;
         }
         return false;

@@ -72,7 +72,7 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
             }
         });
 
-        jsonObjectRequest = new JsonObjectRequest
+        /*jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -87,7 +87,7 @@ public class FavAdapter extends ArrayAdapter<FavObject> {
                         Toast.makeText(getContext(), "" + error, Toast.LENGTH_SHORT).show();
                     }
                 });
-        VolleySingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+        VolleySingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);*/
 
         return convertView;
     }
