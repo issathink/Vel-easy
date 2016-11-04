@@ -31,16 +31,20 @@ public class MarkerManager implements GoogleMap.OnMarkerClickListener {
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        String name = null;
         Log.d("LOGS", marker.getPosition().toString());
         CustomDialog customDialog = new CustomDialog(activity);
         customDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        customDialog.show();
 
         for (Map.Entry<Station, Marker> entry : ((MapsActivity) activity).getCachedStation().entrySet()) {
             LatLng st = entry.getValue().getPosition();
-            if (st.latitude == marker.getPosition().latitude && st.longitude == marker.getPosition().longitude)
-                ((TextView) customDialog.findViewById(R.id.textview)).setText(entry.getKey().getAddressName());
+            if (st.latitude == marker.getPosition().latitude && st.longitude == marker.getPosition().longitude) {
+                name = entry.getKey().getAddressName();
+                customDialog.init(entry.getKey().getNumber(), entry.getKey().getAddressName());
+            }
         }
+        customDialog.show();
+        ((TextView) customDialog.findViewById(R.id.textview)).setText(name);
 
         return true;
     }

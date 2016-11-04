@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">Vel\'easy</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps">Vel\'easy</string>
     <string name="title_item_list">Items</string>
     <string name="title_item_detail">Item Detail</string>
     <string name="velibs_disponibles">Velibs</string>
     <string name="places_disponibles">Places</string>
     <string name="preference">Preferences</string>
+    <string name="no_favorite_message">No favorites to show. To add a station to your favorite click on the marker (position of the station) and then on the heart.</string>
 </resources>
