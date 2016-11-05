@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/widget_bg">
+    android:background="@drawable/widget_bg"
+    android:padding="5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,22 +17,18 @@
             android:id="@+id/fav1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
             android:text="Station favorite"
             android:layout_weight="1"
-            android:textColor="@android:color/white"
-            android:textSize="8sp"
-            android:padding="3dp" />
+            android:padding="3dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         <TextView
             android:id="@+id/fav2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
             android:layout_weight="1"
             android:text="Station favorite"
-            android:textColor="@android:color/white"
-            android:textSize="8sp"
-            android:padding="3dp" />
+            android:padding="3dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     </LinearLayout>
 
@@ -54,14 +51,11 @@
             android:id="@+id/nbVelib1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
             android:layout_weight="1"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
             android:text="10"
             android:layout_gravity="center"
 
-            />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         <ImageView
             android:id="@+id/parking1"
             android:layout_weight="0.5"
@@ -78,11 +72,9 @@
             android:layout_width="wrap_content"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
             android:layout_gravity="center"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:text="10" />
+            android:text="10"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <ImageView
             android:id="@+id/logo2"
@@ -98,11 +90,9 @@
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
             android:layout_gravity="center"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:text="10"/>
+            android:text="10"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
         <ImageView
             android:id="@+id/parking2"
             android:layout_width="20dp"
@@ -118,11 +108,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="10sp"
             android:layout_weight="1"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:text="10" />
+            android:text="10"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
     </LinearLayout>
 
 

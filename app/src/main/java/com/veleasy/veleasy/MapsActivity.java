@@ -248,7 +248,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.velwidget_layout);
         ComponentName thisWidget = new ComponentName(context, VelWidgetProvider.class);
         //remoteViews.setTextViewText(R.id.nbVelib1, "myText 10");
-        appWidgetManager.updateAppWidget(thisWidget, remoteViews);
+        AppWidgetManager.getInstance(context).updateAppWidget(thisWidget, remoteViews);
     }
 
     public void initMapAsync(){
