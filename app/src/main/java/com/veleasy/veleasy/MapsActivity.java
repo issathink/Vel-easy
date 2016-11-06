@@ -1,6 +1,9 @@
 package com.veleasy.veleasy;
 
 import android.Manifest;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -14,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -232,12 +236,19 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     }
 
     public void goToMyLocation(View v) {
-        if(mLastLocation != null) {
+        Log.d("widgeg","toz");
+        /*if(mLastLocation != null) {
             circleCenter = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLng(circleCenter));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
             callToApi(true);
-        }
+        }*/
+        Context context = getApplicationContext();
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.velwidget_layout);
+        ComponentName thisWidget = new ComponentName(context, VelWidgetProvider.class);
+        //remoteViews.setTextViewText(R.id.nbVelib1, "myText 10");
+        AppWidgetManager.getInstance(context).updateAppWidget(thisWidget, remoteViews);
     }
 
     public void initMapAsync(){
